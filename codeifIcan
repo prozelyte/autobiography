@@ -1,0 +1,1245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AUTOBIOGRAPHY // ARCHIVE & WORKS</title>
+
+  <!-- Google Fonts for Clean Maximalist Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,700;1,400&family=Plus+Jakarta+Sans:wght@400;600;800&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+
+  <!-- Google <model-viewer> CDN for Interactive 3D Models (.glb / .gltf) -->
+  <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
+
+  <style>
+    /* ==========================================================================
+       1. MAXIMALIST DESIGN TOKENS & VARIABLES (Edit Colors Here!)
+       ========================================================================== */
+    :root {
+      --bg-primary: #0d0d11;
+      --bg-secondary: #16161e;
+      --bg-card: #1c1c26;
+      --text-main: #f4f3ef;
+      --text-muted: #a0a0b2;
+      --accent-primary: #d4ff00;    /* Acid Lime */
+      --accent-secondary: #ff3e6c;  /* Electric Crimson */
+      --accent-tertiary: #7b61ff;   /* Hyper Violet */
+      --accent-cyan: #00f0ff;       /* Cyber Cyan */
+      --border-color: #f4f3ef;
+      --border-thick: 2px solid var(--border-color);
+      --shadow-hard: 5px 5px 0px var(--accent-primary);
+      --shadow-crimson: 5px 5px 0px var(--accent-secondary);
+      --shadow-violet: 5px 5px 0px var(--accent-tertiary);
+      --radius-sm: 4px;
+      --radius-md: 10px;
+      --transition-fast: 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      --transition-smooth: 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    /* Light/High-Contrast Maximalist Theme Override (Toggled via Nav Button) */
+    body.theme-paper {
+      --bg-primary: #f4f0ea;
+      --bg-secondary: #e6dfd5;
+      --bg-card: #ffffff;
+      --text-main: #111115;
+      --text-muted: #4a4a5a;
+      --accent-primary: #ff3e00;
+      --accent-secondary: #111115;
+      --accent-tertiary: #3b28cc;
+      --border-color: #111115;
+      --shadow-hard: 5px 5px 0px #111115;
+      --shadow-crimson: 5px 5px 0px #ff3e00;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background-color: var(--bg-primary);
+      color: var(--text-main);
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      line-height: 1.6;
+      overflow-x: hidden;
+      /* Subtle architectural grid background */
+      background-image: 
+        linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+      background-size: 40px 40px;
+      min-height: 100vh;
+    }
+
+    body.theme-paper {
+      background-image: 
+        linear-gradient(to right, rgba(0, 0, 0, 0.06) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(0, 0, 0, 0.06) 1px, transparent 1px);
+    }
+
+    /* ==========================================================================
+       2. AUTO-HIDING FIXED NAVIGATION BAR
+       ========================================================================== */
+    .navbar {
+      position: fixed;
+      top: 16px;
+      left: 50%;
+      transform: translateX(-50%) translateY(0);
+      width: min(94%, 1240px);
+      background: var(--bg-secondary);
+      border: var(--border-thick);
+      box-shadow: var(--shadow-hard);
+      border-radius: var(--radius-md);
+      z-index: 1000;
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      transition: transform 0.38s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.3s ease;
+    }
+
+    /* Applied by JS when scrolling down */
+    .navbar.nav-hidden {
+      transform: translateX(-50%) translateY(-150%);
+    }
+
+    .nav-brand {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1.15rem;
+      letter-spacing: -0.02em;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .brand-badge {
+      background: var(--accent-primary);
+      color: #0d0d11;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 3px 8px;
+      border: 1.5px solid #0d0d11;
+      border-radius: var(--radius-sm);
+      text-transform: uppercase;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .nav-btn {
+      background: transparent;
+      color: var(--text-main);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      font-weight: 700;
+      padding: 8px 14px;
+      border: 1.5px solid transparent;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: var(--transition-fast);
+      text-transform: uppercase;
+      position: relative;
+    }
+
+    .nav-btn:hover {
+      border-color: var(--border-color);
+      background: rgba(255, 255, 255, 0.06);
+      transform: translateY(-2px);
+    }
+
+    .nav-btn.active {
+      background: var(--accent-primary);
+      color: #0d0d11;
+      border-color: #0d0d11;
+      box-shadow: 3px 3px 0px var(--accent-secondary);
+    }
+
+    .theme-toggle-btn {
+      background: var(--bg-card);
+      color: var(--text-main);
+      border: var(--border-thick);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+      font-weight: 700;
+      padding: 8px 12px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      box-shadow: 3px 3px 0px var(--accent-tertiary);
+      transition: var(--transition-fast);
+    }
+
+    .theme-toggle-btn:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: 5px 5px 0px var(--accent-tertiary);
+    }
+
+    .theme-toggle-btn:active {
+      transform: translate(2px, 2px);
+      box-shadow: 0px 0px 0px var(--accent-tertiary);
+    }
+
+    /* ==========================================================================
+       3. MULTI-PAGE VIEW SWITCHER LAYOUT
+       ========================================================================== */
+    main {
+      width: min(94%, 1240px);
+      margin: 120px auto 80px;
+    }
+
+    .view-section {
+      display: none;
+      opacity: 0;
+    }
+
+    .view-section.active-view {
+      display: block;
+      animation: viewReveal 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes viewReveal {
+      0% {
+        opacity: 0;
+        transform: translateY(18px) scale(0.99);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    /* ==========================================================================
+       4. MAXIMALIST UI COMPONENTS (Buttons, Marquee, Bento Cards, Badges)
+       ========================================================================== */
+    .marquee-wrap {
+      width: 100%;
+      overflow: hidden;
+      background: var(--accent-primary);
+      color: #0d0d11;
+      border: var(--border-thick);
+      border-radius: var(--radius-sm);
+      padding: 8px 0;
+      margin-bottom: 28px;
+      box-shadow: var(--shadow-crimson);
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .marquee-track {
+      display: flex;
+      width: max-content;
+      animation: marqueeScroll 24s linear infinite;
+    }
+
+    .marquee-track span {
+      padding: 0 24px;
+      white-space: nowrap;
+    }
+
+    @keyframes marqueeScroll {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    .btn-maximal {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--accent-primary);
+      color: #0d0d11;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      padding: 13px 22px;
+      border: 2px solid #0d0d11;
+      border-radius: var(--radius-sm);
+      box-shadow: 4px 4px 0px var(--accent-secondary);
+      cursor: pointer;
+      transition: var(--transition-fast);
+      text-decoration: none;
+    }
+
+    .btn-maximal:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: 6px 6px 0px var(--accent-secondary);
+    }
+
+    .btn-maximal:active {
+      transform: translate(2px, 2px);
+      box-shadow: 1px 1px 0px var(--accent-secondary);
+    }
+
+    .btn-maximal.secondary {
+      background: var(--bg-card);
+      color: var(--text-main);
+      border: var(--border-thick);
+      box-shadow: 4px 4px 0px var(--accent-tertiary);
+    }
+
+    .bento-grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 24px;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: var(--border-thick);
+      border-radius: var(--radius-md);
+      padding: 28px;
+      box-shadow: var(--shadow-hard);
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-3px);
+    }
+
+    .card.shadow-pink { box-shadow: var(--shadow-crimson); }
+    .card.shadow-violet { box-shadow: var(--shadow-violet); }
+
+    .tag-pill {
+      display: inline-block;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1.5px solid var(--border-color);
+      background: var(--bg-secondary);
+      color: var(--accent-primary);
+      margin-bottom: 14px;
+    }
+
+    body.theme-paper .tag-pill {
+      color: var(--accent-tertiary);
+    }
+
+    h1, h2, h3 {
+      font-family: 'Syne', sans-serif;
+      line-height: 1.08;
+      letter-spacing: -0.03em;
+    }
+
+    .hero-title {
+      font-size: clamp(2.4rem, 5vw, 4.4rem);
+      font-weight: 800;
+      margin-bottom: 18px;
+      text-transform: uppercase;
+    }
+
+    .hero-title .highlight {
+      color: var(--accent-primary);
+      text-decoration: underline;
+      text-decoration-color: var(--accent-secondary);
+      text-decoration-thickness: 4px;
+    }
+
+    /* ==========================================================================
+       5. HOME VIEW LAYOUT
+       ========================================================================== */
+    .col-8 { grid-column: span 8; }
+    .col-4 { grid-column: span 4; }
+    .col-6 { grid-column: span 6; }
+    .col-12 { grid-column: span 12; }
+
+    .stat-list {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .stat-box {
+      background: var(--bg-secondary);
+      border: 1.5px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      padding: 14px;
+    }
+
+    .stat-number {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: var(--accent-primary);
+    }
+
+    .stat-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+
+    /* ==========================================================================
+       6. CHAPTER VIEWS (Timeline, Interactive Accordions, Pull Quotes)
+       ========================================================================== */
+    .chapter-header {
+      background: var(--bg-secondary);
+      border: var(--border-thick);
+      border-radius: var(--radius-md);
+      padding: 36px;
+      margin-bottom: 28px;
+      box-shadow: var(--shadow-crimson);
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .chapter-number {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 4rem;
+      font-weight: 700;
+      line-height: 1;
+      color: transparent;
+      -webkit-text-stroke: 2px var(--accent-primary);
+    }
+
+    .timeline {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin-top: 12px;
+    }
+
+    .timeline-item {
+      background: var(--bg-card);
+      border: var(--border-thick);
+      border-radius: var(--radius-md);
+      padding: 24px;
+      box-shadow: var(--shadow-hard);
+      display: grid;
+      grid-template-columns: 160px 1fr;
+      gap: 20px;
+      align-items: start;
+    }
+
+    .timeline-year {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      font-size: 1.05rem;
+      background: var(--accent-tertiary);
+      color: #ffffff;
+      padding: 8px 14px;
+      border-radius: var(--radius-sm);
+      border: 1.5px solid #0d0d11;
+      text-align: center;
+      box-shadow: 3px 3px 0px var(--accent-primary);
+    }
+
+    .quote-callout {
+      background: var(--bg-secondary);
+      border-left: 6px solid var(--accent-secondary);
+      border-top: var(--border-thick);
+      border-right: var(--border-thick);
+      border-bottom: var(--border-thick);
+      padding: 24px;
+      border-radius: var(--radius-sm);
+      font-family: 'Syne', sans-serif;
+      font-size: 1.35rem;
+      margin: 20px 0;
+    }
+
+    /* Interactive Chapter Filter Tabs */
+    .filter-bar {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+
+    /* ==========================================================================
+       7. GALLERY & 3D MODEL SWITCHER VIEW
+       ========================================================================== */
+    .gallery-layout {
+      display: grid;
+      grid-template-columns: 340px 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    .asset-sidebar {
+      background: var(--bg-card);
+      border: var(--border-thick);
+      border-radius: var(--radius-md);
+      padding: 22px;
+      box-shadow: var(--shadow-violet);
+    }
+
+    .asset-select-dropdown {
+      width: 100%;
+      padding: 12px 14px;
+      background: var(--bg-secondary);
+      color: var(--text-main);
+      border: var(--border-thick);
+      border-radius: var(--radius-sm);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      font-weight: 700;
+      margin-bottom: 18px;
+      cursor: pointer;
+    }
+
+    .thumbnail-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-height: 460px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    .thumb-card {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 12px;
+      background: var(--bg-secondary);
+      border: 1.5px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: var(--transition-fast);
+      text-align: left;
+      color: var(--text-main);
+    }
+
+    .thumb-card:hover {
+      transform: translateX(4px);
+      border-color: var(--accent-primary);
+    }
+
+    .thumb-card.active {
+      background: var(--accent-primary);
+      color: #0d0d11;
+      border-color: #0d0d11;
+      box-shadow: 3px 3px 0px var(--accent-secondary);
+    }
+
+    .thumb-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 3px 7px;
+      border-radius: 3px;
+      background: #0d0d11;
+      color: var(--accent-primary);
+      flex-shrink: 0;
+    }
+
+    .thumb-card.active .thumb-badge {
+      background: #0d0d11;
+      color: #ffffff;
+    }
+
+    .stage-container {
+      background: var(--bg-card);
+      border: var(--border-thick);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-hard);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .stage-topbar {
+      background: var(--bg-secondary);
+      border-bottom: var(--border-thick);
+      padding: 14px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .window-dots {
+      display: flex;
+      gap: 8px;
+    }
+
+    .dot {
+      width: 13px;
+      height: 13px;
+      border-radius: 50%;
+      border: 1.5px solid #0d0d11;
+    }
+    .dot.red { background: var(--accent-secondary); }
+    .dot.yellow { background: var(--accent-primary); }
+    .dot.cyan { background: var(--accent-cyan); }
+
+    .stage-viewport {
+      width: 100%;
+      height: 500px;
+      position: relative;
+      background: radial-gradient(circle at center, rgba(123, 97, 255, 0.16) 0%, rgba(13, 13, 17, 0.9) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    model-viewer {
+      width: 100%;
+      height: 100%;
+      --poster-color: transparent;
+    }
+
+    .artwork-2d-wrapper {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      position: relative;
+    }
+
+    .artwork-2d-wrapper img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      border: var(--border-thick);
+      border-radius: var(--radius-sm);
+      box-shadow: var(--shadow-crimson);
+      cursor: zoom-in;
+      transition: transform 0.25s ease;
+    }
+
+    .artwork-2d-wrapper img:hover {
+      transform: scale(1.02);
+    }
+
+    .stage-controls {
+      padding: 18px 24px;
+      background: var(--bg-secondary);
+      border-top: var(--border-thick);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 14px;
+    }
+
+    .stage-info {
+      padding: 24px;
+    }
+
+    .control-btn-group {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .ctrl-btn {
+      background: var(--bg-card);
+      color: var(--text-main);
+      border: 1.5px solid var(--border-color);
+      padding: 8px 14px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+      font-weight: 700;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: var(--transition-fast);
+      text-transform: uppercase;
+    }
+
+    .ctrl-btn:hover {
+      background: var(--accent-primary);
+      color: #0d0d11;
+      border-color: #0d0d11;
+    }
+
+    /* ==========================================================================
+       8. FULLSCREEN HIGH-RES 2D LIGHTBOX MODAL
+       ========================================================================== */
+    .lightbox-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(10, 10, 14, 0.92);
+      backdrop-filter: blur(8px);
+      z-index: 2000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+    }
+
+    .lightbox-modal.open {
+      display: flex;
+      animation: viewReveal 0.25s ease forwards;
+    }
+
+    .lightbox-content {
+      max-width: 92vw;
+      max-height: 86vh;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .lightbox-content img {
+      max-width: 100%;
+      max-height: 78vh;
+      border: 3px solid var(--accent-primary);
+      box-shadow: 8px 8px 0px var(--accent-secondary);
+      border-radius: var(--radius-sm);
+    }
+
+    .lightbox-close {
+      position: absolute;
+      top: -20px;
+      right: -20px;
+      background: var(--accent-secondary);
+      color: #ffffff;
+      border: 2px solid #ffffff;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      padding: 8px 14px;
+      cursor: pointer;
+      border-radius: var(--radius-sm);
+      box-shadow: 4px 4px 0px #000000;
+    }
+
+    /* ==========================================================================
+       9. RESPONSIVE BREAKPOINTS
+       ========================================================================== */
+    @media (max-width: 960px) {
+      .col-8, .col-4, .col-6 {
+        grid-column: span 12;
+      }
+      .gallery-layout {
+        grid-template-columns: 1fr;
+      }
+      .timeline-item {
+        grid-template-columns: 1fr;
+      }
+      .navbar {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 12px 16px;
+      }
+      .nav-brand {
+        justify-content: space-between;
+      }
+      .nav-links {
+        justify-content: center;
+      }
+      main {
+        margin-top: 170px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ==========================================================================
+       FIXED TOP NAVIGATION BAR (Auto-Hides on Scroll Down, Shows on Scroll Up)
+       ========================================================================== -->
+  <header class="navbar" id="mainNavbar">
+    <div class="nav-brand" onclick="switchView('home')">
+      <span>ARCHIVE // AUTOBIOGRAPHY</span>
+      <span class="brand-badge">VOL. 01</span>
+    </div>
+
+    <nav class="nav-links" aria-label="Primary Navigation">
+      <button class="nav-btn active" data-target="home" onclick="switchView('home')">00. Home</button>
+      <button class="nav-btn" data-target="chapter1" onclick="switchView('chapter1')">01. Chapter I</button>
+      <button class="nav-btn" data-target="chapter2" onclick="switchView('chapter2')">02. Chapter II</button>
+      <button class="nav-btn" data-target="gallery" onclick="switchView('gallery')">03. Gallery / Models</button>
+      <button class="theme-toggle-btn" id="themeToggle" onclick="toggleTheme()" title="Switch Color Palette">
+        ⚡ FLIP PALETTE
+      </button>
+    </nav>
+  </header>
+
+  <main>
+    <!-- ========================================================================
+         VIEW 00: HOME SCREEN
+         ======================================================================== -->
+    <section id="view-home" class="view-section active-view">
+      
+      <!-- Kinetic Maximalist Marquee Banner -->
+      <div class="marquee-wrap">
+        <div class="marquee-track">
+          <span>★ INTERACTIVE AUTOBIOGRAPHY & DIGITAL ARCHIVE</span>
+          <span>//</span>
+          <span>PHILOSOPHY • ILLUSTRATION • GAME ARCHITECTURE • 3D ASSETS</span>
+          <span>//</span>
+          <span>SCROLL DOWN TO TEST AUTO-HIDE NAVBAR</span>
+          <span>//</span>
+          <span>★ INTERACTIVE AUTOBIOGRAPHY & DIGITAL ARCHIVE</span>
+          <span>//</span>
+          <span>PHILOSOPHY • ILLUSTRATION • GAME ARCHITECTURE • 3D ASSETS</span>
+          <span>//</span>
+          <span>SCROLL DOWN TO TEST AUTO-HIDE NAVBAR</span>
+        </div>
+      </div>
+
+      <div class="bento-grid">
+        <!-- Main Hero Card -->
+        <div class="card col-8">
+          <span class="tag-pill">LIVING DOCUMENT // EST. 2026</span>
+          <h1 class="hero-title">
+            MAPPING THE <span class="highlight">ARCHITECTURE</span> OF THOUGHT & CRAFT.
+          </h1>
+          <p style="font-size: 1.1rem; color: var(--text-muted); margin-bottom: 28px; max-width: 65ch;">
+            Welcome to my personal digital archive. This space chronicles my origins, intellectual frameworks, creative projects, and visual artifacts—combining written chapters with an interactive 2D/3D model inspection stage.
+          </p>
+          <div style="display: flex; gap: 16px; flex-wrap: wrap;">
+            <button class="btn-maximal" onclick="switchView('chapter1')">
+              READ CHAPTER I →
+            </button>
+            <button class="btn-maximal secondary" onclick="switchView('gallery')">
+              LAUNCH 3D / ART STAGE ✦
+            </button>
+          </div>
+        </div>
+
+        <!-- Quick Vitals / Index Card -->
+        <div class="card col-4 shadow-pink">
+          <span class="tag-pill">SYSTEM TELEMETRY</span>
+          <h2 style="font-size: 1.6rem; margin-bottom: 10px;">CURRENT FOCUS</h2>
+          <p style="font-size: 0.92rem; color: var(--text-muted);">
+            Synthesizing classical philosophy, psychological frameworks, digital illustration, and interactive game systems.
+          </p>
+          <div class="stat-list">
+            <div class="stat-box">
+              <div class="stat-number">04</div>
+              <div class="stat-label">SITE MODULES</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-number">2D/3D</div>
+              <div class="stat-label">ASSET ENGINE</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-number">SPA</div>
+              <div class="stat-label">ZERO RELOADS</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-number">100%</div>
+              <div class="stat-label">SELF-HOSTED</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chapter Previews Row -->
+        <div class="card col-6 shadow-violet">
+          <span class="tag-pill">SECTION 01</span>
+          <h3 style="font-size: 1.75rem; margin-bottom: 12px;">CHAPTER I: ORIGINS & FOUNDATIONS</h3>
+          <p style="color: var(--text-muted); margin-bottom: 20px;">
+            Early curiosities, formative milestones, and the shift from passive observation to building servers, worlds, and philosophical frameworks.
+          </p>
+          <button class="ctrl-btn" onclick="switchView('chapter1')">OPEN CHAPTER I →</button>
+        </div>
+
+        <div class="card col-6">
+          <span class="tag-pill">SECTION 02</span>
+          <h3 style="font-size: 1.75rem; margin-bottom: 12px;">CHAPTER II: SYNTHESIS & WORKS</h3>
+          <p style="color: var(--text-muted); margin-bottom: 20px;">
+            Exploring current creative mechanics—digital illustration workflows, game scripting, theoretical analysis, and ongoing experiments.
+          </p>
+          <button class="ctrl-btn" onclick="switchView('chapter2')">OPEN CHAPTER II →</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================================
+         VIEW 01: CHAPTER 1 (ORIGINS & FOUNDATIONS)
+         ======================================================================== -->
+    <section id="view-chapter1" class="view-section">
+      <div class="chapter-header">
+        <div>
+          <span class="tag-pill">AUTOBIOGRAPHY // PART ONE</span>
+          <h1 style="font-size: clamp(2rem, 4vw, 3.4rem);">ORIGINS & FOUNDATIONS</h1>
+        </div>
+        <div class="chapter-number">CH.01</div>
+      </div>
+
+      <div class="bento-grid">
+        <div class="card col-8">
+          <h2 style="font-size: 1.8rem; margin-bottom: 16px;">THE EARLY BLUEPRINT</h2>
+          <p style="margin-bottom: 16px;">
+            Every creative trajectory begins with curiosity about how underlying systems operate. Long before writing code or sketching digital compositions, my focus gravitated toward taking apart narratives, mechanics, and environments to see what made them hold together.
+          </p>
+          
+          <div class="quote-callout">
+            "To understand a system is to gain the freedom to redesign it—whether that system is a network, a philosophical argument, or a blank canvas."
+          </div>
+
+          <p>
+            You can edit this paragraph directly inside <code>index.html</code> to recount your personal background, early memories, and the specific turning points that shaped your perspective.
+          </p>
+        </div>
+
+        <div class="card col-4 shadow-violet">
+          <span class="tag-pill">CORE INFLUENCES</span>
+          <h3 style="font-size: 1.4rem; margin-bottom: 14px;">PILLARS OF INQUIRY</h3>
+          <ul style="list-style: none; display: flex; flex-direction: column; gap: 12px; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem;">
+            <li style="padding: 10px; background: var(--bg-secondary); border: 1px solid var(--border-color);">01 // Classical & Moral Philosophy</li>
+            <li style="padding: 10px; background: var(--bg-secondary); border: 1px solid var(--border-color);">02 // Psychoanalytic Theory & Memetics</li>
+            <li style="padding: 10px; background: var(--bg-secondary); border: 1px solid var(--border-color);">03 // Worldbuilding & Character Lore</li>
+            <li style="padding: 10px; background: var(--bg-secondary); border: 1px solid var(--border-color);">04 // Self-Hosted Multiplayer Systems</li>
+          </ul>
+        </div>
+
+        <div class="col-12">
+          <h2 style="font-size: 2rem; margin: 16px 0;">CHRONOLOGICAL MILESTONES</h2>
+          <div class="timeline">
+            <div class="timeline-item">
+              <div class="timeline-year">ERA // 01</div>
+              <div>
+                <h3 style="font-size: 1.4rem; margin-bottom: 6px;">FIRST DIGITAL EXPERIMENTS</h3>
+                <p style="color: var(--text-muted);">
+                  Configuring local machines, troubleshooting operating environments, and discovering the satisfaction of building customized digital spaces for friends across the globe.
+                </p>
+              </div>
+            </div>
+
+            <div class="timeline-item">
+              <div class="timeline-year">ERA // 02</div>
+              <div>
+                <h3 style="font-size: 1.4rem; margin-bottom: 6px;">VISUAL & NARRATIVE EXPLORATION</h3>
+                <p style="color: var(--text-muted);">
+                  Transitioning from consumer to creator—adopting tablet illustration workflows and studying character design, visual symbolism, and narrative pacing.
+                </p>
+              </div>
+            </div>
+
+            <div class="timeline-item">
+              <div class="timeline-year">ERA // 03</div>
+              <div>
+                <h3 style="font-size: 1.4rem; margin-bottom: 6px;">ACADEMIC & PHILOSOPHICAL SYNTHESIS</h3>
+                <p style="color: var(--text-muted);">
+                  Bridging ancient art history, ethics, and psychological frameworks with hands-on software and game development.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top: 32px; display: flex; justify-content: space-between;">
+        <button class="btn-maximal secondary" onclick="switchView('home')">← BACK HOME</button>
+        <button class="btn-maximal" onclick="switchView('chapter2')">CONTINUE TO CHAPTER II →</button>
+      </div>
+    </section>
+
+    <!-- ========================================================================
+         VIEW 02: CHAPTER 2 (EVOLUTION & CRAFT)
+         ======================================================================== -->
+    <section id="view-chapter2" class="view-section">
+      <div class="chapter-header">
+        <div>
+          <span class="tag-pill">AUTOBIOGRAPHY // PART TWO</span>
+          <h1 style="font-size: clamp(2rem, 4vw, 3.4rem);">EVOLUTION, CRAFT & SYSTEMS</h1>
+        </div>
+        <div class="chapter-number">CH.02</div>
+      </div>
+
+      <!-- Interactive Category Filter Coded in Vanilla JS -->
+      <div class="filter-bar" aria-label="Filter Discipline Cards">
+        <button class="ctrl-btn" onclick="filterChapterCards('all')">SHOW ALL DISCIPLINES</button>
+        <button class="ctrl-btn" onclick="filterChapterCards('code')">SYSTEMS & CODE</button>
+        <button class="ctrl-btn" onclick="filterChapterCards('art')">VISUAL ART & DESIGN</button>
+        <button class="ctrl-btn" onclick="filterChapterCards('theory')">THEORY & PROSE</button>
+      </div>
+
+      <div class="bento-grid" id="chapter2Grid">
+        <div class="card col-6 chapter-card" data-category="code">
+          <span class="tag-pill">SYSTEMS & CODE</span>
+          <h3 style="font-size: 1.65rem; margin-bottom: 12px;">2D GAME ARCHITECTURE & SERVERS</h3>
+          <p style="color: var(--text-muted); margin-bottom: 16px;">
+            Designing modular 2D game loops, collision mechanics, and custom multiplayer server configurations that bring people together across continents.
+          </p>
+          <p style="font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: var(--accent-primary);">
+            STACK: Lua / LÖVE • Fabric Server Architecture • Cross-OS Emulation
+          </p>
+        </div>
+
+        <div class="card col-6 shadow-pink chapter-card" data-category="art">
+          <span class="tag-pill">VISUAL ART & DESIGN</span>
+          <h3 style="font-size: 1.65rem; margin-bottom: 12px;">DIGITAL ILLUSTRATION & MODELING</h3>
+          <p style="color: var(--text-muted); margin-bottom: 16px;">
+            Crafting expressive character studies, symbolic ethics maps, and interactive 3D/2D assets designed with deliberate linework and striking contrast.
+          </p>
+          <p style="font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: var(--accent-primary);">
+            TOOLS: 64-Bit Digital Canvas • Pen Tablet • WebGL / Model-Viewer
+          </p>
+        </div>
+
+        <div class="card col-6 shadow-violet chapter-card" data-category="theory">
+          <span class="tag-pill">THEORY & PROSE</span>
+          <h3 style="font-size: 1.65rem; margin-bottom: 12px;">PHILOSOPHICAL & ANALYTICAL WRITING</h3>
+          <p style="color: var(--text-muted); margin-bottom: 16px;">
+            Investigating the intersection of classical virtue ethics, libidinal economy, cognitive dissonance, and cultural memetics through rigorous long-form essays.
+          </p>
+          <p style="font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: var(--accent-primary);">
+            FOCUS: Ontology • Psychoanalysis • Ancient Art History
+          </p>
+        </div>
+
+        <div class="card col-6 chapter-card" data-category="code">
+          <span class="tag-pill">SYSTEMS & CODE</span>
+          <h3 style="font-size: 1.65rem; margin-bottom: 12px;">WORKFLOW AUTOMATION & SYNTHESIS</h3>
+          <p style="color: var(--text-muted); margin-bottom: 16px;">
+            Transforming raw lectures, complex outlines, and technical documentation into structured, high-retention knowledge bases and interactive web tools.
+          </p>
+          <p style="font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: var(--accent-primary);">
+            METHOD: Modular Documentation • Automated Pipelines
+          </p>
+        </div>
+      </div>
+
+      <div style="margin-top: 32px; display: flex; justify-content: space-between;">
+        <button class="btn-maximal secondary" onclick="switchView('chapter1')">← CHAPTER I</button>
+        <button class="btn-maximal" onclick="switchView('gallery')">INSPECT MODELS & GALLERY →</button>
+      </div>
+    </section>
+
+    <!-- ========================================================================
+         VIEW 03: DYNAMIC GALLERY & 3D MODEL SWITCHER
+         ======================================================================== -->
+    <section id="view-gallery" class="view-section">
+      <div class="chapter-header">
+        <div>
+          <span class="tag-pill">INTERACTIVE ARCHIVE // 3D & 2D ENGINE</span>
+          <h1 style="font-size: clamp(2rem, 4vw, 3.4rem);">MODELS & ARTWORK VAULT</h1>
+        </div>
+        <div class="chapter-number">VAULT</div>
+      </div>
+
+      <div class="gallery-layout">
+        <!-- Left Sidebar: Dropdown + Thumbnail List Switcher -->
+        <aside class="asset-sidebar">
+          <span class="tag-pill">SELECT ARTIFACT</span>
+          <h3 style="font-size: 1.35rem; margin-bottom: 12px;">ASSET SWITCHER</h3>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 14px;">
+            Switch between interactive 3D <code>.glb</code> models and high-res 2D illustrations using the dropdown or thumbnail cards below.
+          </p>
+
+          <!-- Quick Dropdown Selector -->
+          <select id="assetDropdown" class="asset-select-dropdown" onchange="selectAsset(this.value)" aria-label="Select Model or Artwork">
+            <!-- Populated dynamically from the JS array -->
+          </select>
+
+          <!-- Thumbnail Selection Menu -->
+          <div id="thumbnailContainer" class="thumbnail-list">
+            <!-- Populated dynamically from the JS array -->
+          </div>
+        </aside>
+
+        <!-- Right Stage: Dynamic 3D / 2D Viewport + Functioning Controls -->
+        <div class="stage-container">
+          <div class="stage-topbar">
+            <div class="window-dots">
+              <span class="dot red"></span>
+              <span class="dot yellow"></span>
+              <span class="dot cyan"></span>
+            </div>
+            <div id="stageHeaderBadge" style="font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; font-weight: 700;">
+              LOADING ASSET...
+            </div>
+            <div style="display: flex; gap: 8px;">
+              <button class="ctrl-btn" onclick="stepAsset(-1)">◀ PREV</button>
+              <button class="ctrl-btn" onclick="stepAsset(1)">NEXT ▶</button>
+            </div>
+          </div>
+
+          <!-- Dynamic Viewport (Renders either <model-viewer> or 2D Artwork) -->
+          <div class="stage-viewport" id="stageViewport">
+            <!-- Injected by JS -->
+          </div>
+
+          <!-- Interactive Stage Controls Bar -->
+          <div class="stage-controls">
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; color: var(--text-muted);" id="stageStatusHint">
+              DRAG TO ROTATE • SCROLL TO ZOOM
+            </div>
+            <div class="control-btn-group" id="stageActionButtons">
+              <!-- Context-sensitive buttons injected by JS -->
+            </div>
+          </div>
+
+          <!-- Active Asset Metadata Description -->
+          <div class="stage-info">
+            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px; flex-wrap: wrap;">
+              <h2 id="assetTitle" style="font-size: 1.8rem;">Asset Title</h2>
+              <span id="assetCategoryTag" class="tag-pill" style="margin-bottom: 0;">3D MODEL</span>
+            </div>
+            <p id="assetDescription" style="color: var(--text-muted); margin-bottom: 12px;">
+              Description of the selected model or artwork goes here.
+            </p>
+            <div id="assetSpecs" style="font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: var(--accent-primary);">
+              SPECS: GLTF/GLB
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ==========================================================================
+       HIGH-RES 2D LIGHTBOX MODAL
+       ========================================================================== -->
+  <div class="lightbox-modal" id="lightboxModal" onclick="closeLightbox(event)">
+    <div class="lightbox-content">
+      <button class="lightbox-close" onclick="closeLightbox(event)">✕ CLOSE [ESC]</button>
+      <img id="lightboxImg" src="" alt="High resolution artwork preview" />
+      <div id="lightboxCaption" style="font-family: 'JetBrains Mono', monospace; font-weight: 700; color: var(--accent-primary);"></div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       JAVASCRIPT ENGINE (Easy Asset Array + View Manager + Scroll Listener)
+       ========================================================================== -->
+  <script>
+    /* ==========================================================================
+       1. EDIT YOUR MODELS & ARTWORK HERE!
+       To add your own files on GitHub Pages:
+       1. Create an "assets" folder in your repository.
+       2. Upload your .glb 3D models or .png/.jpg illustrations there.
+       3. Add or edit an entry in PORTFOLIO_ASSETS below with src: "assets/your-file.glb"
+       ========================================================================== */
+    const PORTFOLIO_ASSETS = [
+      {
+        id: "model-astronaut",
+        title: "ORBITAL EXPLORER RIG",
+        type: "3d", // Use "3d" for .glb/.gltf files, or "2d" for images/illustrations
+        category: "3D CHARACTER MODEL",
+        src: "https://modelviewer.dev/shared-assets/models/Astronaut.glb",
+        description: "Interactive 3D character suit rendered in real-time via WebGL. Use your mouse or touch to orbit 360 degrees, inspect surface materials, or toggle auto-rotation below.",
+        specs: "FORMAT: .GLB // SHADER: PBR METAL-ROUGHNESS // INTERACTIVE CAMERA"
+      },
+      {
+        id: "model-robot",
+        title: "AUTOMATON UNIT // MK-IV",
+        type: "3d",
+        category: "3D ANIMATED ASSET",
+        src: "https://modelviewer.dev/shared-assets/models/RobotExpressive.glb",
+        description: "Expressive hard-surface mechanical rig featuring articulated joints. Replace this URL with 'assets/models/your-model.glb' in the code array to showcase your own 3D creations.",
+        specs: "FORMAT: .GLB // RIGGED & ANIMATED // REAL-TIME SHADOWS"
+      },
+      {
+        id: "art-ethics-map",
+        title: "CARTOGRAPHY OF THE SOUL & VIRTUE",
+        type: "2d",
+        category: "2D DIGITAL ILLUSTRATION",
+        // Sample self-contained SVG illustration (swap with 'assets/images/my-drawing.png')
+        src: "data:image/svg+xml;utf8," + encodeURIComponent(`
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" width="1200" height="800">
+            <rect width="1200" height="800" fill="#12121a"/>
+            <g stroke="#2a2a3a" stroke-width="2">
+              <line x1="0" y1="200" x2="1200" y2="200"/>
+              <line x1="0" y1="400" x2="1200" y2="400"/>
+              <line x1="0" y1="600" x2="1200" y2="600"/>
+              <line x1="300" y1="0" x2="300" y2="800"/>
+              <line x1="600" y1="0" x2="600" y2="800"/>
+              <line x1="900" y1="0" x2="900" y2="800"/>
+            </g>
+            <circle cx="600" cy="400" r="260" fill="none" stroke="#d4ff00" stroke-width="4" stroke-dasharray="14 8"/>
+            <circle cx="600" cy="400" r="180" fill="none" stroke="#ff3e6c" stroke-width="3"/>
+            <polygon points="600,160 810,520 390,520" fill="rgba(123,97,255,0.22)" stroke="#7b61ff" stroke-width="4"/>
+            <circle cx="600" cy="160" r="18" fill="#d4ff00" stroke="#12121a" stroke-width="4"/>
+            <circle cx="810" cy="520" r="18" fill="#ff3e6c" stroke="#12121a" stroke-width="4"/>
+            <circle cx="390" cy="520" r="18" fill="#00f0ff" stroke="#12121a" stroke-width="4"/>
+            <text x="600" y="95" fill="#f4f3ef" font-family="monospace" font-size="24" font-weight="bold" text-anchor="middle">TELOS // THE IDEAL HORIZON</text>
+            <text x="600" y="410" fill="#d4ff00" font-family="sans-serif" font-size="36" font-weight="bold" text-anchor="middle">CONCORDIA &amp; AUTONOMY</text>
+            <text x="600" y="730" fill="#a0a0b2" font-family="monospace" font-size="18" text-anchor="middle">CLICK IMAGE OR "FULLSCREEN LIGHTBOX" BUTTON TO INSPECT HIGH-RES</text>
+          </svg>
+        `),
+        description: "A symbolic visual schematic mapping philosophical tension, cardinal virtues, and structural coherence. Click the artwork or the Lightbox button to inspect in fullscreen.",
+        specs: "MEDIUM: 64-BIT DIGITAL CANVAS & TABLET // RESOLUTION: HIGH-DPI"
+      },
+      {
+        id: "art-forest-level",
+        title: "2D ENGINE // FOREST REALM CONCEPT",
+        type: "2d",
+        category: "GAME ART & SPRITE DESIGN",
+        src: "data:image/svg+xml;utf8," + encodeURIComponent(`
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" width="1200" height="800">
+            <rect width="1200" height="800" fill="#0b191e"/>
+            <circle cx="950" cy="180" r="90" fill="#d4ff00" opacity="0.9"/>
+            <polygon points="100,800 320,300 540,800" fill="#132f38" stroke="#00f0ff" stroke-width="3"/>
+            <polygon points="420,800 680,220 940,800" fill="#1a434e" stroke="#d4ff00" stroke-width="3"/>
+            <polygon points="760,800 980,340 1180,800" fill="#132f38" stroke="#ff3e6c" stroke-width="3"/>
+            <rect x="0" y="680" width="1200" height="120" fill="#0d0d11" stroke="#d4ff00" stroke-width="4"/>
+            <circle cx="600" cy="610" r="24" fill="#ff3e6c" stroke="#ffffff" stroke-width="4"/>
+            <circle cx="450" cy="540" r="14" fill="#d4ff00"/>
+            <circle cx="680" cy="480" r="14" fill="#d4ff00"/>
+            <circle cx="820" cy="560" r="14" fill="#d4ff00"/>
+            <text x="60" y="80" fill="#d4ff00" font-family="monospace" font-size="26" font-weight="bold">STAGE_01 // FOREST MAP PROTOTYPE</text>
+            <text x="60" y="745" fill="#f4f3ef" font-family="monospace" font-size="20">LUA / LÖVE2D TILE &amp; ENTITY COLLISION LAYER</text>
+          </svg>
+        `),
+        description: "Concept layout and entity layering for a custom 2D Lua game project. Easily replace this entry with your own PNG/WebP drawings or sprite sheets.",
+        specs: "FRAMEWORK: LUA 2D // LAYERED ENVIRONMENT STUDY"
+      },
+      {
+        id: "model-damaged-helmet",
+        title: "SCI-FI VANGUARD HELMET",
+        type: "3d",
+        category: "3D PROP & TEXTURE STUDY",
+        src: "https://modelviewer.dev/shared-assets/models/DamagedHelmet.glb",
+        description: "High-detail 3D prop showcasing emissive maps, battle-worn surface normal maps, and environmental reflections.",
+        specs: "FORMAT: .GLB // EMISSIVE & NORMAL MAPS // 360° ORBIT"
+      }
+    ];
+
+    /* ==========================================================================
+       2. MULTI-PAGE VIEW SWITCHER (SPA CLIENT-SIDE ROUTER)
+       ========================================================================== */
+    function switchView(viewName) {
+      // 1. Toggle active view container
+      const views = document.querySelectorAll('.view-section');
+      views.forEach(view => view.classList.remove('active-view'));
+
+      const targetView = document.getElementById(`view-${viewName}`);
+      if (targetView) {
+        targetView.classList.add('active-view');
+      }
+
+      // 2. Update active button in the top navigation bar
+      const navButtons = document.querySelectorAll('.nav-btn');
+      navButtons.forEach(btn => {
+        btn.classList.toggle('active', btn.getAttribute('data-target') === viewName);
+      });
+
+      // 3. Smoothly reset scroll to top and ensure navbar is visible
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      document.getElementById('mainNavbar').classList.remove('nav-hidden');
+    }
+
+    /* ==========================================================================
+       3. AUTO-HIDING NAVBAR SCROLL DIRECTION LISTENER
+       ========================================================================== */
+    let lastScrollY = window.scrollY;
+    const navbar = document.getElementById('mainNavbar');
+
+    window.addEventListener('scroll', () => {
+      const currentScrollY = window.scrollY;
