@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="royal">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SOVEREIGN ARCHIVE // PERSONAL NEXUS</title>
+
+  <!-- Hardened Single-Line CSP (Prevents multi-line parsing errors in Safari/Chrome) -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'none'; object-src 'none'; base-uri 'self'; form-action 'none';" />
+  <meta name="referrer" content="no-referrer" />
+  <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800&family=Cormorant+Garamond:ital,wght@0,500;0,700;1,500&family=JetBrains+Mono:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;500;700&family=Special+Elite&display=swap" rel="stylesheet">
+
+  <style>
+    /* ==========================================================================
+       THEME TOKENS
+       ========================================================================== */
+    :root,
+    [data-theme="royal"] {
+      --bg-base: #0a0910;
+      --bg-surface: #13111c;
+      --bg-elevated: #1b1828;
+      --bg-glass: #13111ceb; /* Solid fallback with slight opacity (prevents blur bleed) */
+      --text-primary: #ece8e1;
+      --text-secondary: #a39cb0;
+      --accent-primary: #c5a059;
+      --accent-secondary: #8a64d6;
+      --accent-glow: rgba(197, 160, 89, 0.18);
+      --border-main: 1px solid rgba(197, 160, 89, 0.38);
+      --border-strong: 1px solid #c5a059;
+      --shadow-card: 0 14px 34px rgba(0, 0, 0, 0.65);
+      --font-display: 'Cinzel', serif;
+      --font-body: 'Plus Jakarta Sans', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      --radius: 6px;
+      --horror-opacity: 0;
+    }
+
+    [data-theme="horror"] {
+      --bg-base: #090a07;
+      --bg-surface: #141610;
+      --bg-elevated: #1c1f16;
+      --bg-glass: #141610f2;
+      --text-primary: #d5ceb8;
+      --text-secondary: #8c8773;
+      --accent-primary: #7cfc00;
+      --accent-secondary: #9e2a2b;
+      --accent-glow: rgba(158, 42, 43, 0.28);
+      --border-main: 1px dashed rgba(140, 135, 115, 0.45);
+      --border-strong: 2px solid #9e2a2b;
+      --shadow-card: 0 0 28px rgba(0, 0, 0, 0.9);
+      --font-display: 'Special Elite', monospace;
+      --font-body: 'JetBrains Mono', monospace;
+      --font-mono: 'JetBrains Mono', monospace;
+      --radius: 2px;
+      --horror-opacity: 1;
+    }
+
+    [data-theme="luxury"] {
+      --bg-base: #040d0a;
+      --bg-surface: #081813;
+      --bg-elevated: #0d241d;
+      --bg-glass: #081813f2;
+      --text-primary: #fdfbf7;
+      --text-secondary: #c9bfa8;
+      --accent-primary: #f3cf7a;
+      --accent-secondary: #d49b35;
+      --accent-glow: rgba(243, 207, 122, 0.25);
+      --border-main: 3px double rgba(243, 207, 122, 0.55);
+      --border-strong: 4px double #f3cf7a;
+      --shadow-card: 0 20px 50px rgba(0, 0, 0, 0.85);
+      --font-display: 'Cinzel', serif;
+      --font-body: 'Cormorant Garamond', serif;
+      --font-mono: 'Cinzel', serif;
+      --radius: 0px;
+      --horror-opacity: 0;
+    }
+
+    [data-theme="minimal"] {
+      --bg-base: #000000;
+      --bg-surface: #000000;
+      --bg-elevated: #0a0a0a;
+      --bg-glass: #000000;
+      --text-primary: #ffffff;
+      --text-secondary: #b0b0b0;
+      --accent-primary: #ffffff;
+      --accent-secondary: #ffffff;
+      --accent-glow: transparent;
+      --border-main: 1px solid #ffffff;
+      --border-strong: 2px solid #ffffff;
+      --shadow-card: none;
+      --font-display: 'JetBrains Mono', monospace;
+      --font-body: 'Plus Jakarta Sans', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      --radius: 0px;
+      --horror-opacity: 0;
+    }
+
+    /* ==========================================================================
+       BASE RESETS & HARDWARE ISOLATION
+       ========================================================================== */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background-color: var(--bg-base);
+      color: var(--text-primary);
+      font-family: var(--font-body);
+      line-height: 1.65;
+      min-height: 125vh;
+      overflow-x: hidden;
+      /* Ensures text rendering stays crisp */
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      text-rendering: optimizeLegibility;
+      position: relative;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      background: radial-gradient(circle at 50% 0%, var(--accent-glow), transparent 65%);
+    }
+
+    /* Horror Scanlines */
+    [data-theme="horror"] body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 998;
+      background: repeating-linear-gradient(
+        0deg,
+        rgba(0, 0, 0, 0.1
