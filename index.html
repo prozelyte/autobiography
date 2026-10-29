@@ -1,0 +1,1311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Regal Sanctum & Archive</title>
+  
+  <!-- Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Fira+Code:wght@300;400;600&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    /* =====================================================================
+       1. DESIGN TOKENS & BASE PALETTES
+       ===================================================================== */
+    :root {
+      /* Default Sovereign Nocturne (Deep Obsidian & Royal Gold) */
+      --bg-primary: #0a0910;
+      --bg-secondary: #13111c;
+      --bg-surface: #1a1726;
+      --bg-surface-elevated: #242036;
+      --border-accent: #c5a059;
+      --border-subtle: rgba(197, 160, 89, 0.25);
+      --text-main: #ece8e1;
+      --text-muted: #9e9aa7;
+      --accent-glow: rgba(197, 160, 89, 0.15);
+      --font-display: 'Cinzel', serif;
+      --font-body: 'Plus Jakarta Sans', sans-serif;
+      --font-mono: 'Fira Code', monospace;
+      --transition-smooth: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      --radius-sm: 4px;
+      --radius-md: 8px;
+      --filigree-display: block;
+      --texture-overlay: radial-gradient(circle at 50% 0%, rgba(197, 160, 89, 0.05) 0%, transparent 75%);
+    }
+
+    /* THEME 1: Flesh & Web (Magnus Archives / Outlast Trials Decay) */
+    body[data-theme="archive-horror"] {
+      --bg-primary: #11100e;
+      --bg-secondary: #181613;
+      --bg-surface: #221f1a;
+      --bg-surface-elevated: #2d2922;
+      --border-accent: #8b3a2b; /* Dull surgical rust / oxidized blood */
+      --border-subtle: rgba(94, 102, 65, 0.35); /* Chitinous olive tint */
+      --text-main: #d3cbbe; /* Rotted bone / parchment */
+      --text-muted: #797163;
+      --accent-glow: rgba(139, 58, 43, 0.25);
+      --font-display: 'Cormorant Garamond', serif;
+      --font-body: 'Plus Jakarta Sans', sans-serif;
+      --filigree-display: none;
+      --texture-overlay: radial-gradient(circle at 20% 30%, rgba(94, 102, 65, 0.1) 0%, transparent 60%),
+                         radial-gradient(circle at 80% 80%, rgba(139, 58, 43, 0.12) 0%, transparent 70%);
+    }
+
+    /* THEME 2: Imperial Gilded / Sovereign */
+    body[data-theme="imperial-gilded"] {
+      --bg-primary: #050b08; /* Deep Velvet Emerald / Obsidian */
+      --bg-secondary: #0a1410;
+      --bg-surface: #101e18;
+      --bg-surface-elevated: #162820;
+      --border-accent: #e5c158;
+      --border-subtle: rgba(229, 193, 88, 0.45);
+      --text-main: #fcf9ee;
+      --text-muted: #a3b2a9;
+      --accent-glow: rgba(229, 193, 88, 0.22);
+      --font-display: 'Cinzel', serif;
+      --font-body: 'Cormorant Garamond', serif;
+      --radius-sm: 0px;
+      --radius-md: 2px;
+      --filigree-display: block;
+      --texture-overlay: radial-gradient(circle at 50% 50%, rgba(229, 193, 88, 0.08) 0%, transparent 80%);
+    }
+
+    /* THEME 3: Monochrome Terminal / Stark Minimalist */
+    body[data-theme="mono-terminal"] {
+      --bg-primary: #000000;
+      --bg-secondary: #080808;
+      --bg-surface: #111111;
+      --bg-surface-elevated: #1a1a1a;
+      --border-accent: #ffffff;
+      --border-subtle: #333333;
+      --text-main: #ffffff;
+      --text-muted: #888888;
+      --accent-glow: rgba(255, 255, 255, 0.1);
+      --font-display: 'Fira Code', monospace;
+      --font-body: 'Fira Code', monospace;
+      --radius-sm: 0px;
+      --radius-md: 0px;
+      --filigree-display: none;
+      --texture-overlay: none;
+    }
+
+    /* =====================================================================
+       2. GLOBAL RESETS & FOUNDATION
+       ===================================================================== */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      min-height: 100vh;
+      background-color: var(--bg-primary);
+      color: var(--text-main);
+      font-family: var(--font-body);
+      line-height: 1.6;
+      position: relative;
+      overflow-x: hidden;
+      transition: background-color 0.4s ease, color 0.4s ease;
+    }
+
+    /* Ambient procedural canvas texture */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background: var(--texture-overlay);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* Procedural Web Accents (Flesh & Web Theme) */
+    .web-overlay {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 2;
+      opacity: 0;
+      transition: opacity 0.6s ease;
+    }
+
+    body[data-theme="archive-horror"] .web-overlay {
+      opacity: 0.35;
+    }
+
+    .corner-web {
+      position: absolute;
+      width: 240px;
+      height: 240px;
+      fill: none;
+      stroke: var(--text-muted);
+      stroke-width: 0.8;
+      opacity: 0.6;
+    }
+
+    .web-tl { top: 0; left: 0; }
+    .web-br { bottom: 0; right: 0; transform: rotate(180deg); }
+
+    /* =====================================================================
+       3. EERIE THEME OVERRIDE BANNER
+       ===================================================================== */
+    #transient-banner {
+      position: fixed;
+      top: -60px;
+      left: 0;
+      width: 100%;
+      height: 42px;
+      background: #8b3a2b;
+      color: #fff;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      letter-spacing: 0.12em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.7);
+      transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+    }
+
+    #transient-banner.active {
+      transform: translateY(60px);
+    }
+
+    /* =====================================================================
+       4. ADAPTIVE NAVIGATION (TOP TO PERMANENT SIDEBAR)
+       ===================================================================== */
+    /* State A: Top Navigation Bar */
+    #adaptive-nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 70px;
+      background: rgba(10, 9, 16, 0.85);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border-subtle);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 3rem;
+      transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+                  width 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+                  height 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+                  left 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+                  padding 0.4s ease,
+                  background 0.4s ease,
+                  border-color 0.4s ease;
+    }
+
+    /* State B: Docked Sidebar Menu */
+    body.sidebar-docked #adaptive-nav {
+      top: 0;
+      left: 0;
+      width: 280px;
+      height: 100vh;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: space-between;
+      padding: 2.5rem 1.75rem;
+      border-bottom: none;
+      border-right: 1px solid var(--border-subtle);
+      background: var(--bg-secondary);
+      box-shadow: 10px 0 35px rgba(0, 0, 0, 0.45);
+    }
+
+    /* Main body offset when docked */
+    .app-viewport {
+      position: relative;
+      z-index: 5;
+      padding-top: 90px; /* clear top nav */
+      transition: margin-left 0.5s cubic-bezier(0.16, 1, 0.3, 1), max-width 0.5s ease;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding-left: 2rem;
+      padding-right: 2rem;
+      padding-bottom: 5rem;
+    }
+
+    body.sidebar-docked .app-viewport {
+      margin-left: 280px;
+      max-width: calc(100% - 280px);
+      padding-top: 3.5rem;
+      padding-left: 3.5rem;
+      padding-right: 3.5rem;
+    }
+
+    /* Brand Header */
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      cursor: pointer;
+    }
+
+    .brand-sigil {
+      width: 28px;
+      height: 28px;
+      border: 1px solid var(--border-accent);
+      transform: rotate(45deg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition-smooth);
+    }
+
+    .brand-sigil span {
+      transform: rotate(-45deg);
+      font-family: var(--font-display);
+      font-size: 0.8rem;
+      color: var(--border-accent);
+      font-weight: 700;
+    }
+
+    .brand-title {
+      font-family: var(--font-display);
+      font-size: 1.05rem;
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--text-main);
+    }
+
+    /* Navigation Links */
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      list-style: none;
+      transition: var(--transition-smooth);
+    }
+
+    body.sidebar-docked .nav-links {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1.25rem;
+      width: 100%;
+      margin: 2rem 0;
+    }
+
+    .nav-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      cursor: pointer;
+      padding: 0.5rem 0.75rem;
+      position: relative;
+      transition: var(--transition-smooth);
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      width: 100%;
+      text-align: left;
+    }
+
+    .nav-btn span.num {
+      font-size: 0.65rem;
+      color: var(--border-accent);
+      opacity: 0.8;
+    }
+
+    .nav-btn:hover,
+    .nav-btn.active {
+      color: var(--text-main);
+    }
+
+    .nav-btn.active {
+      color: var(--border-accent);
+    }
+
+    body.sidebar-docked .nav-btn.active {
+      background: rgba(197, 160, 89, 0.08);
+      border-left: 3px solid var(--border-accent);
+      padding-left: 1rem;
+    }
+
+    /* Theme Switcher Dock */
+    .theme-dock {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .theme-dock-label {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-muted);
+      margin-bottom: 0.25rem;
+      display: none;
+    }
+
+    body.sidebar-docked .theme-dock-label {
+      display: block;
+    }
+
+    .theme-buttons {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    body.sidebar-docked .theme-buttons {
+      flex-direction: column;
+      width: 100%;
+    }
+
+    .theme-tag-btn {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      padding: 0.4rem 0.75rem;
+      cursor: pointer;
+      transition: var(--transition-smooth);
+      border-radius: var(--radius-sm);
+      text-align: left;
+    }
+
+    .theme-tag-btn:hover {
+      border-color: var(--border-accent);
+      color: var(--text-main);
+    }
+
+    .theme-tag-btn.active {
+      background: var(--border-accent);
+      color: var(--bg-primary);
+      border-color: var(--border-accent);
+      font-weight: 600;
+    }
+
+    /* Imperial Gilded Theme Sheen */
+    body[data-theme="imperial-gilded"] .nav-btn.active,
+    body[data-theme="imperial-gilded"] .theme-tag-btn.active {
+      background: linear-gradient(135deg, #f0cf75 0%, #c5a059 50%, #947129 100%);
+      color: #050b08;
+      box-shadow: 0 0 15px rgba(229, 193, 88, 0.35);
+    }
+
+    /* =====================================================================
+       5. CONTENT VIEWS (SPA ARCHITECTURE)
+       ===================================================================== */
+    .view-container {
+      display: none;
+      animation: fadeIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .view-container.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(12px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .section-eyebrow {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--border-accent);
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .section-eyebrow::before {
+      content: "";
+      width: 14px;
+      height: 1px;
+      background: var(--border-accent);
+    }
+
+    .section-title {
+      font-family: var(--font-display);
+      font-size: 2.4rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      margin-bottom: 2.5rem;
+      color: var(--text-main);
+      position: relative;
+    }
+
+    /* Filigree separator for imperial style */
+    .filigree-separator {
+      display: var(--filigree-display);
+      width: 100%;
+      height: 18px;
+      margin: 1.5rem 0 2.5rem 0;
+      opacity: 0.6;
+    }
+
+    /* =====================================================================
+       PAGE 1: IDENTITY & MUSIC TRANSMISSIONS
+       ===================================================================== */
+    .bio-hero-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      padding: 3rem;
+      border-radius: var(--radius-md);
+      position: relative;
+      margin-bottom: 3.5rem;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+      overflow: hidden;
+    }
+
+    /* Dual-line filigree border effect */
+    body[data-theme="imperial-gilded"] .bio-hero-card {
+      border: 2px solid var(--border-accent);
+      outline: 1px solid var(--border-accent);
+      outline-offset: -7px;
+    }
+
+    .bio-name {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      line-height: 1.15;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 1.25rem;
+      letter-spacing: 0.04em;
+    }
+
+    .bio-statement {
+      font-size: 1.15rem;
+      color: var(--text-muted);
+      max-width: 780px;
+      margin-bottom: 1.75rem;
+      font-weight: 300;
+      line-height: 1.8;
+    }
+
+    .philosophy-quote {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 1.25rem;
+      color: var(--border-accent);
+      border-left: 2px solid var(--border-accent);
+      padding-left: 1.25rem;
+      margin-top: 1.5rem;
+    }
+
+    /* Audio Transmissions Grid */
+    .transmission-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1.75rem;
+      margin-top: 1.5rem;
+    }
+
+    .track-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 1.75rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: var(--transition-smooth);
+      position: relative;
+    }
+
+    .track-card:hover {
+      border-color: var(--border-accent);
+      transform: translateY(-4px);
+      box-shadow: 0 12px 25px var(--accent-glow);
+    }
+
+    .track-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 1.25rem;
+    }
+
+    .track-id {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--border-accent);
+      letter-spacing: 0.1em;
+    }
+
+    .track-play-pulse {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--border-accent);
+      box-shadow: 0 0 10px var(--border-accent);
+    }
+
+    .track-title {
+      font-family: var(--font-display);
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--text-main);
+      margin-bottom: 0.25rem;
+    }
+
+    .track-artist {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--border-accent);
+      margin-bottom: 1rem;
+    }
+
+    .track-commentary {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+      border-top: 1px solid var(--border-subtle);
+      padding-top: 1rem;
+      font-style: italic;
+    }
+
+    /* =====================================================================
+       PAGE 2: VISUAL ARCHIVE / ARTWORK GALLERY
+       ===================================================================== */
+    .gallery-intro {
+      color: var(--text-muted);
+      max-width: 650px;
+      margin-bottom: 2.5rem;
+      font-size: 0.95rem;
+    }
+
+    .art-archive-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 2rem;
+    }
+
+    .art-frame {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      position: relative;
+      cursor: pointer;
+      transition: var(--transition-smooth);
+      aspect-ratio: 4 / 5;
+    }
+
+    .art-frame:hover {
+      border-color: var(--border-accent);
+      transform: translateY(-5px);
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    .art-placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(145deg, var(--bg-secondary), var(--bg-surface-elevated));
+      position: relative;
+      overflow: hidden;
+    }
+
+    .art-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .art-frame:hover .art-image {
+      transform: scale(1.05);
+    }
+
+    .art-badge {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      border: 1px solid var(--border-subtle);
+      padding: 0.25rem 0.5rem;
+      color: var(--border-accent);
+      margin-bottom: 0.5rem;
+      text-transform: uppercase;
+    }
+
+    .art-caption-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(10, 9, 16, 0.95) 0%, rgba(10, 9, 16, 0.6) 50%, transparent 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 1.5rem;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: var(--transition-smooth);
+    }
+
+    .art-frame:hover .art-caption-overlay {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .art-title {
+      font-family: var(--font-display);
+      font-size: 1.15rem;
+      color: var(--text-main);
+      margin-bottom: 0.25rem;
+    }
+
+    .art-meta {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--border-accent);
+      margin-bottom: 0.5rem;
+    }
+
+    .art-desc {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    /* =====================================================================
+       PAGE 3: NEXUS / SOCIAL FREQUENCIES
+       ===================================================================== */
+    .nexus-links-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .social-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 1.75rem;
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+      text-decoration: none;
+      color: var(--text-main);
+      transition: var(--transition-smooth);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .social-card::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 3px;
+      height: 100%;
+      background: var(--border-accent);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .social-card:hover {
+      border-color: var(--border-accent);
+      transform: translateX(6px);
+      background: var(--bg-surface-elevated);
+    }
+
+    .social-card:hover::after {
+      opacity: 1;
+    }
+
+    .social-icon-box {
+      width: 48px;
+      height: 48px;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg-secondary);
+      color: var(--border-accent);
+      flex-shrink: 0;
+      transition: var(--transition-smooth);
+    }
+
+    .social-card:hover .social-icon-box {
+      border-color: var(--border-accent);
+      box-shadow: 0 0 15px var(--accent-glow);
+    }
+
+    .social-info {
+      flex: 1;
+    }
+
+    .social-platform {
+      font-family: var(--font-display);
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    .social-handle {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .social-badge {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      color: var(--border-accent);
+      background: var(--accent-glow);
+      padding: 0.2rem 0.5rem;
+      border-radius: 2px;
+      letter-spacing: 0.05em;
+    }
+
+    /* =====================================================================
+       LIGHTBOX MODAL FOR ARTWORK
+       ===================================================================== */
+    #lightbox-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.92);
+      backdrop-filter: blur(8px);
+      z-index: 10000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      cursor: zoom-out;
+    }
+
+    #lightbox-modal.active {
+      display: flex;
+    }
+
+    .modal-box {
+      max-width: 900px;
+      max-height: 90vh;
+      border: 1px solid var(--border-accent);
+      background: var(--bg-surface);
+      padding: 1.5rem;
+      cursor: default;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .modal-box img {
+      max-width: 100%;
+      max-height: 70vh;
+      object-fit: contain;
+    }
+
+    .modal-close-btn {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      color: var(--border-accent);
+      cursor: pointer;
+    }
+
+    /* =====================================================================
+       RESPONSIVE ADAPTATIONS
+       ===================================================================== */
+    @media (max-width: 900px) {
+      /* Mobile safeguard: retain flexible drawer behavior */
+      body.sidebar-docked #adaptive-nav {
+        width: 100%;
+        height: auto;
+        position: fixed;
+        border-right: none;
+        border-bottom: 1px solid var(--border-subtle);
+        padding: 1.25rem 1.5rem;
+      }
+
+      body.sidebar-docked .app-viewport {
+        margin-left: 0;
+        max-width: 100%;
+        padding-top: 160px;
+      }
+
+      #adaptive-nav {
+        padding: 1rem 1.5rem;
+      }
+
+      .nav-links {
+        gap: 0.75rem;
+      }
+    }
+  </style>
+</head>
+<body data-theme="default">
+
+  <!-- ===================================================================
+       THEMATIC ASSETS & PROCEDURAL ACCENTS
+       =================================================================== -->
+  <!-- Transient Dread Notification Banner (Archive Horror Mode) -->
+  <div id="transient-banner">
+    // SYSTEM CORRUPTED: ENTITY OVERRIDE [THE WEBS &amp; THE CORRUPTION] // RECEPTACLE ONLINE
+  </div>
+
+  <!-- SVG Corner Spiderwebs for Flesh & Web Mode -->
+  <div class="web-overlay">
+    <svg class="corner-web web-tl" viewBox="0 0 100 100">
+      <path d="M0,0 L100,0 M0,0 L92,38 M0,0 L70,70 M0,0 L38,92 M0,0 L0,100" stroke="currentColor"/>
+      <path d="M30,0 C30,15 15,30 0,30" stroke="currentColor"/>
+      <path d="M60,0 C60,32 32,60 0,60" stroke="currentColor"/>
+      <path d="M90,0 C90,48 48,90 0,90" stroke="currentColor"/>
+    </svg>
+    <svg class="corner-web web-br" viewBox="0 0 100 100">
+      <path d="M0,0 L100,0 M0,0 L92,38 M0,0 L70,70 M0,0 L38,92 M0,0 L0,100" stroke="currentColor"/>
+      <path d="M30,0 C30,15 15,30 0,30" stroke="currentColor"/>
+      <path d="M60,0 C60,32 32,60 0,60" stroke="currentColor"/>
+      <path d="M90,0 C90,48 48,90 0,90" stroke="currentColor"/>
+    </svg>
+  </div>
+
+  <!-- ===================================================================
+       ADAPTIVE NAVIGATION MENU (Locks to Sidebar after scroll)
+       =================================================================== -->
+  <nav id="adaptive-nav">
+    <div class="nav-brand" onclick="switchView('view-identity')">
+      <div class="brand-sigil"><span>◇</span></div>
+      <div class="brand-title">SANCTUM</div>
+    </div>
+
+    <!-- View Switching Actions -->
+    <ul class="nav-links">
+      <li>
+        <button class="nav-btn active" data-target="view-identity">
+          <span class="num">01.</span> Identity &amp; Audio
+        </button>
+      </li>
+      <li>
+        <button class="nav-btn" data-target="view-archive">
+          <span class="num">02.</span> Visual Archive
+        </button>
+      </li>
+      <li>
+        <button class="nav-btn" data-target="view-nexus">
+          <span class="num">03.</span> Nexus Frequencies
+        </button>
+      </li>
+    </ul>
+
+    <!-- Multi-Theme Dock Engine -->
+    <div class="theme-dock">
+      <span class="theme-dock-label">Atmosphere Matrix</span>
+      <div class="theme-buttons">
+        <button class="theme-tag-btn active" data-theme="default" title="Royal Dark Default">Default</button>
+        <button class="theme-tag-btn" data-theme="archive-horror" title="The Magnus Archives / Outlast Trials Flesh &amp; Web">Flesh &amp; Web</button>
+        <button class="theme-tag-btn" data-theme="imperial-gilded" title="Gilded Sovereign Filigree">Imperial</button>
+        <button class="theme-tag-btn" data-theme="mono-terminal" title="Monochrome Brutalist Minimal">Terminal</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ===================================================================
+       APP VIEWPORT: SPA PAGE VIEWS
+       =================================================================== -->
+  <main class="app-viewport">
+
+    <!-- =================================================================
+         PAGE 1: IDENTITY & MUSIC RECOMMENDATIONS
+         ================================================================= -->
+    <section id="view-identity" class="view-container active">
+      <div class="section-eyebrow">Personal Dossier &amp; Transmission</div>
+      
+      <!-- Biography Card -->
+      <article class="bio-hero-card">
+        <h1 class="bio-name">Caelum Vane</h1>
+        <p class="bio-statement">
+          Architect of synthetic atmospheres, digital illustrator, and sound archivist. Designing at the intersection of classical ornamentation, industrial dread, and modern minimalist systems.
+        </p>
+        <div class="philosophy-quote">
+          "Beauty without discipline is ephemeral; structure without atmospheric depth is hollow."
+        </div>
+      </article>
+
+      <!-- Decorative SVG Filigree for Imperial Mode -->
+      <svg class="filigree-separator" viewBox="0 0 800 20" preserveAspectRatio="none">
+        <path d="M0,10 L350,10 L370,18 L400,2 L430,18 L450,10 L800,10" fill="none" stroke="currentColor" stroke-width="1.2" opacity="0.3"/>
+      </svg>
+
+      <!-- Music Recommendations -->
+      <div class="section-eyebrow">Audio Transmissions // Current Frequency</div>
+      <h2 class="section-title">Curated Resonances</h2>
+
+      <div class="transmission-grid">
+        <!-- Audio Transmission Card 1 -->
+        <div class="track-card">
+          <div>
+            <div class="track-header">
+              <span class="track-id">TX-001 // REPEAT</span>
+              <div class="track-play-pulse"></div>
+            </div>
+            <h3 class="track-title">Metamodernity</h3>
+            <p class="track-artist">Vansire</p>
+          </div>
+          <p class="track-commentary">
+            "A shimmering meditation on contemporary dislocation. Perfect cadence for long late-night architectural renderings."
+          </p>
+        </div>
+
+        <!-- Audio Transmission Card 2 -->
+        <div class="track-card">
+          <div>
+            <div class="track-header">
+              <span class="track-id">TX-002 // CHITIN</span>
+              <div class="track-play-pulse"></div>
+            </div>
+            <h3 class="track-title">The Hunt</h3>
+            <p class="track-artist">Mica Levi</p>
+          </div>
+          <p class="track-commentary">
+            "Abrasive, discordant microtonal strings evoking pure predatory dread. Essential listening for dark illustrative sessions."
+          </p>
+        </div>
+
+        <!-- Audio Transmission Card 3 -->
+        <div class="track-card">
+          <div>
+            <div class="track-header">
+              <span class="track-id">TX-003 // ETHEREAL</span>
+              <div class="track-play-pulse"></div>
+            </div>
+            <h3 class="track-title">Consolations in D-Flat</h3>
+            <p class="track-artist">Franz Liszt</p>
+          </div>
+          <p class="track-commentary">
+            "Uncompromising classical poise. Reminds one of velvet chambers and the patience required for high craft."
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- =================================================================
+         PAGE 2: VISUAL ARCHIVE / ARTWORK GALLERY
+         ================================================================= -->
+    <section id="view-archive" class="view-container">
+      <div class="section-eyebrow">Curated Relics</div>
+      <h2 class="section-title">Visual Archive</h2>
+      <p class="gallery-intro">
+        A repository of digital studies, dark concept illustrations, and geometric blueprints. Select an artifact to examine full resolution.
+      </p>
+
+      <!-- ARTWORK CONTAINER GRID -->
+      <div class="art-archive-grid">
+
+        <!-- ===============================================================
+             ARTWORK ITEM 01: INSTRUCTIONS FOR REPLACING WITH REAL ASSETS:
+             1. Replace the inner div or SVG with: <img src="assets/art-01.png" alt="Title" class="art-image">
+             2. Modify the data-full-img attribute to match your full-size asset link
+             3. Edit title, medium, and commentary below
+             =============================================================== -->
+        <div class="art-frame" data-full-img="assets/art-01.png" onclick="openLightbox(this)">
+          <div class="art-placeholder">
+            <!-- Asset SVG Blueprint Mockup (Replace with <img> when ready) -->
+            <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" opacity="0.6">
+              <polygon points="12 2 2 7 12 12 22 7 12 2"/>
+              <polyline points="2 17 12 22 22 17"/>
+              <polyline points="2 12 12 17 22 12"/>
+            </svg>
+            <div class="art-badge" style="margin-top: 1rem;">CANVAS // 01</div>
+          </div>
+          <div class="art-caption-overlay">
+            <div class="art-meta">PLATE NO. 081 // 2026</div>
+            <h3 class="art-title">The Obsidian Monolith</h3>
+            <p class="art-desc">Subsurface scattering study in dark silicate minerals and ambient occlusion.</p>
+          </div>
+        </div>
+
+        <!-- ===============================================================
+             ARTWORK ITEM 02: PASTE ASSET PATH HERE (e.g. assets/art-02.png)
+             =============================================================== -->
+        <div class="art-frame" data-full-img="assets/art-02.png" onclick="openLightbox(this)">
+          <div class="art-placeholder">
+            <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" opacity="0.6">
+              <circle cx="12" cy="12" r="10"/>
+              <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/>
+              <path d="M2 12h20"/>
+            </svg>
+            <div class="art-badge" style="margin-top: 1rem;">CANVAS // 02</div>
+          </div>
+          <div class="art-caption-overlay">
+            <div class="art-meta">PLATE NO. 094 // 2026</div>
+            <h3 class="art-title">Chitinous Architecture</h3>
+            <p class="art-desc">Biomechanical cathedral interior influenced by arthropod anatomy and bone pillars.</p>
+          </div>
+        </div>
+
+        <!-- ===============================================================
+             ARTWORK ITEM 03: PASTE ASSET PATH HERE (e.g. assets/art-03.png)
+             =============================================================== -->
+        <div class="art-frame" data-full-img="assets/art-03.png" onclick="openLightbox(this)">
+          <div class="art-placeholder">
+            <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" opacity="0.6">
+              <rect x="3" y="3" width="18" height="18" rx="2"/>
+              <line x1="3" y1="9" x2="21" y2="9"/>
+              <line x1="9" y1="21" x2="9" y2="9"/>
+            </svg>
+            <div class="art-badge" style="margin-top: 1rem;">CANVAS // 03</div>
+          </div>
+          <div class="art-caption-overlay">
+            <div class="art-meta">PLATE NO. 102 // 2026</div>
+            <h3 class="art-title">Gilded Reliquary</h3>
+            <p class="art-desc">Procedural filigree test rendered in 32-bit floating point color with brass wear simulation.</p>
+          </div>
+        </div>
+
+        <!-- ===============================================================
+             ARTWORK ITEM 04: PASTE ASSET PATH HERE (e.g. assets/art-04.png)
+             =============================================================== -->
+        <div class="art-frame" data-full-img="assets/art-04.png" onclick="openLightbox(this)">
+          <div class="art-placeholder">
+            <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" opacity="0.6">
+              <polygon points="6 2 18 2 18 6 6 6"/>
+              <rect x="3" y="6" width="18" height="16" rx="2"/>
+            </svg>
+            <div class="art-badge" style="margin-top: 1rem;">CANVAS // 04</div>
+          </div>
+          <div class="art-caption-overlay">
+            <div class="art-meta">PLATE NO. 115 // 2026</div>
+            <h3 class="art-title">The Murkoff Valve</h3>
+            <p class="art-desc">Clinical decay study in chipped industrial enamel, oxidized lead, and harsh fluorescent spill.</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- =================================================================
+         PAGE 3: NEXUS / SOCIAL FREQUENCIES
+         ================================================================= -->
+    <section id="view-nexus" class="view-container">
+      <div class="section-eyebrow">Direct Links &amp; Relays</div>
+      <h2 class="section-title">Nexus Frequencies</h2>
+      
+      <div class="nexus-links-list">
+        <!-- GitHub -->
+        <a href="https://github.com" target="_blank" rel="noopener noreferrer" class="social-card">
+          <div class="social-icon-box">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
+            </svg>
+          </div>
+          <div class="social-info">
+            <div class="social-platform">GitHub</div>
+            <div class="social-handle">@caelum-vane</div>
+          </div>
+          <span class="social-badge">CODE</span>
+        </a>
+
+        <!-- ArtStation / Portfolio -->
+        <a href="https://artstation.com" target="_blank" rel="noopener noreferrer" class="social-card">
+          <div class="social-icon-box">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5 12 2"/>
+              <line x1="12" y1="22" x2="12" y2="15.5"/>
+              <polyline points="22 8.5 12 15.5 2 8.5"/>
+            </svg>
+          </div>
+          <div class="social-info">
+            <div class="social-platform">ArtStation</div>
+            <div class="social-handle">/caelum_arch</div>
+          </div>
+          <span class="social-badge">VISUALS</span>
+        </a>
+
+        <!-- Mastodon / Fediverse -->
+        <a href="https://joinmastodon.org" target="_blank" rel="noopener noreferrer" class="social-card">
+          <div class="social-icon-box">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="2" y="2" width="20" height="20" rx="5"/>
+              <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+              <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+            </svg>
+          </div>
+          <div class="social-info">
+            <div class="social-platform">Fediverse</div>
+            <div class="social-handle">@vane@mercury.zone</div>
+          </div>
+          <span class="social-badge">DISPATCH</span>
+        </a>
+
+        <!-- Encrypted Mail -->
+        <a href="mailto:vane@domain.com" class="social-card">
+          <div class="social-icon-box">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect width="20" height="16" x="2" y="4" rx="2"/>
+              <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+            </svg>
+          </div>
+          <div class="social-info">
+            <div class="social-platform">PGP Transmission</div>
+            <div class="social-handle">caelum.vane@proton.me</div>
+          </div>
+          <span class="social-badge">DIRECT</span>
+        </a>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ===================================================================
+       LIGHTBOX PREVIEW MODAL
+       =================================================================== -->
+  <div id="lightbox-modal" onclick="closeLightbox(event)">
+    <div class="modal-box">
+      <button class="modal-close-btn" onclick="closeLightbox(null)">&times;</button>
+      <div id="lightbox-content"></div>
+      <div id="lightbox-caption" style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--border-accent);"></div>
+    </div>
+  </div>
+
+  <!-- ===================================================================
+       CLIENT LOGIC & INTERACTION ENGINE
+       =================================================================== -->
+  <script>
+    /* ------------------------------------------------------------------
+       1. Adaptive Navigation: Scroll Triggered Sidebar Docking
+       Locks to left permanently once 60px scroll distance is reached
+       ------------------------------------------------------------------ */
+    let hasDockedSidebar = false;
+    const SCROLL_THRESHOLD = 60;
+
+    window.addEventListener('scroll', () => {
+      // Once docked, it will NEVER return to top until hard-refresh
+      if (!hasDockedSidebar && window.scrollY > SCROLL_THRESHOLD) {
+        document.body.classList.add('sidebar-docked');
+        hasDockedSidebar = true;
+      }
+    }, { passive: true });
+
+    /* ------------------------------------------------------------------
+       2. Single-Page Application (SPA) View Switcher
+       ------------------------------------------------------------------ */
+    const navButtons = document.querySelectorAll('.nav-btn');
+    const viewContainers = document.querySelectorAll('.view-container');
+
+    function switchView(targetId) {
+      // Update Buttons
+      navButtons.forEach(btn => {
+        btn.classList.toggle('active', btn.getAttribute('data-target') === targetId);
+      });
+
+      // Update Views
+      viewContainers.forEach(view => {
+        if (view.id === targetId) {
+          view.classList.add('active');
+        } else {
+          view.classList.remove('active');
+        }
+      });
+
+      // Smooth scroll back to top of viewport
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    navButtons.forEach(button => {
+      button.addEventListener('click', (e) => {
+        const targetView = e.currentTarget.getAttribute('data-target');
+        switchView(targetView);
+      });
+    });
+
+    /* ------------------------------------------------------------------
+       3. Multi-Theme Switching Engine
+       ------------------------------------------------------------------ */
+    const themeButtons = document.querySelectorAll('.theme-tag-btn');
+    const transientBanner = document.getElementById('transient-banner');
+    let bannerTimeout;
+
+    themeButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const selectedTheme = btn.getAttribute('data-theme');
+
+        // Apply attribute to body
+        document.body.setAttribute('data-theme', selectedTheme);
+
+        // Update active button state
+        themeButtons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        // Flesh & Web Special Trigger: Transient Horror Banner
+        if (selectedTheme === 'archive-horror') {
+          triggerTransientBanner();
+        } else {
+          transientBanner.classList.remove('active');
+          clearTimeout(bannerTimeout);
+        }
+      });
+    });
+
+    function triggerTransientBanner() {
+      transientBanner.classList.add('active');
+      clearTimeout(bannerTimeout);
+      bannerTimeout = setTimeout(() => {
+        transientBanner.classList.remove('active');
+      }, 5500);
+    }
+
+    /* ------------------------------------------------------------------
+       4. Lightbox Visualizer
+       ------------------------------------------------------------------ */
+    const lightboxModal = document.getElementById('lightbox-modal');
+    const lightboxContent = document.getElementById('lightbox-content');
+    const lightboxCaption = document.getElementById('lightbox-caption');
+
+    function openLightbox(frameElement) {
+      const fullImgSrc = frameElement.getAttribute('data-full-img');
+      const title = frameElement.querySelector('.art-title')?.innerText || 'Archive Plate';
+      const meta = frameElement.querySelector('.art-meta')?.innerText || '';
+
+      // Check if real image or fallback illustration placeholder
+      if (fullImgSrc && !fullImgSrc.includes('assets/art-')) {
+        lightboxContent.innerHTML = `<img src="${fullImgSrc}" alt="${title}">`;
+      } else {
+        lightboxContent.innerHTML = `
+          <div style="padding: 3rem; text-align: center; border: 1px dashed var(--border-accent);">
+            <p style="font-family: var(--font-display); font-size: 1.5rem; margin-bottom: 0.5rem;">${title}</p>
+            <p style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-muted);">[LOCAL ASSET STAND-IN: ${fullImgSrc}]</p>
+            <p style="font-size: 0.85rem; margin-top: 1rem; color: var(--text-muted);">Replace with real image in source code at comments indicated.</p>
+          </div>
+        `;
+      }
+
+      lightboxCaption.innerHTML = `${title} &mdash; ${meta}`;
+      lightboxModal.classList.add('active');
+    }
+
+    function closeLightbox(event) {
+      if (!event || event.target === lightboxModal || event.target.classList.contains('modal-close-btn')) {
+        lightboxModal.classList.remove('active');
+      }
+    }
+  </script>
+</body>
+</html>
