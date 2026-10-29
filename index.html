@@ -1,0 +1,1095 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="royal">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ROYAL ARCHIVE // PORTFOLIO</title>
+
+  <style>
+    /* ==========================================================================
+       1. ULTRA-FAST THEME DEFINITIONS (ZERO EXTERNAL REQUESTS / ZERO BLUR)
+       ========================================================================== */
+
+    /* DEFAULT: Sleek Dark & Royal */
+    :root,
+    [data-theme="royal"] {
+      --bg-main: #09080f;
+      --bg-panel: #12101d;
+      --bg-card: #1a172a;
+      --bg-nav: #0e0c18;
+      --text-main: #f0ece1;
+      --text-muted: #9e96b0;
+      --accent: #cba358;
+      --accent-soft: #8565c4;
+      --border: 1px solid #3a324d;
+      --border-accent: 1px solid #cba358;
+      --shadow: 0 10px 25px rgba(0, 0, 0, 0.55);
+      --radius: 6px;
+      --font-heading: 'Palatino Linotype', 'Book Antiqua', Palatino, Georgia, serif;
+      --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --font-mono: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+      --horror-display: none;
+    }
+
+    /* FORMAT 1: Scary (The Magnus Archives & The Outlast Trials) */
+    [data-theme="horror"] {
+      --bg-main: #0a0b08;
+      --bg-panel: #12140e;
+      --bg-card: #191c14;
+      --bg-nav: #0d0f0a;
+      --text-main: #d6d0be;
+      --text-muted: #84806f;
+      --accent: #5ce62e;      /* Outlast Trials Night-Vision Green */
+      --accent-soft: #9e2a2b; /* Magnus Archives Dried Rust / Corruption */
+      --border: 1px dashed #4a4d3f;
+      --border-accent: 2px solid #9e2a2b;
+      --shadow: 0 8px 24px rgba(0, 0, 0, 0.85);
+      --radius: 2px;
+      --font-heading: 'Courier New', Courier, monospace;
+      --font-body: 'Courier New', Courier, monospace;
+      --font-mono: 'Courier New', Courier, monospace;
+      --horror-display: block;
+    }
+
+    /* FORMAT 2: Fully Luxurious Reformat (Lavish Gold & Velvet Emerald) */
+    [data-theme="luxury"] {
+      --bg-main: #040b08;
+      --bg-panel: #081611;
+      --bg-card: #0c211a;
+      --bg-nav: #06110d;
+      --text-main: #faf6eb;
+      --text-muted: #c7bca5;
+      --accent: #f3cf7a;
+      --accent-soft: #b8862d;
+      --border: 3px double #8c6a2b;
+      --border-accent: 3px double #f3cf7a;
+      --shadow: 0 14px 35px rgba(0, 0, 0, 0.75);
+      --radius: 0px;
+      --font-heading: 'Palatino Linotype', 'Book Antiqua', Palatino, Georgia, serif;
+      --font-body: Georgia, 'Times New Roman', serif;
+      --font-mono: 'Palatino Linotype', Georgia, serif;
+      --horror-display: none;
+    }
+
+    /* FORMAT 3: Simple Black & White Basic Reformat */
+    [data-theme="bw"] {
+      --bg-main: #000000;
+      --bg-panel: #000000;
+      --bg-card: #000000;
+      --bg-nav: #000000;
+      --text-main: #ffffff;
+      --text-muted: #bbbbbb;
+      --accent: #ffffff;
+      --accent-soft: #ffffff;
+      --border: 1px solid #ffffff;
+      --border-accent: 2px solid #ffffff;
+      --shadow: none;
+      --radius: 0px;
+      --font-heading: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --font-mono: monospace;
+      --horror-display: none;
+    }
+
+    /* ==========================================================================
+       2. CORE RESET & SLEEK LAYOUT
+       ========================================================================== */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      font-family: var(--font-body);
+      line-height: 1.6;
+      min-height: 130vh; /* Ensures scroll space to trigger permanent sidebar */
+      overflow-x: hidden;
+    }
+
+    /* ==========================================================================
+       3. NAVIGATION: STARTS AT TOP -> PERMANENTLY MOVES TO SIDE ON SCROLL
+       ========================================================================== */
+    .site-nav {
+      position: fixed;
+      z-index: 100;
+      background-color: var(--bg-nav);
+    }
+
+    /* Initial State: Top Bar */
+    body:not(.sidebar-locked) .site-nav {
+      top: 0;
+      left: 0;
+      right: 0;
+      min-height: 76px;
+      border-bottom: var(--border-accent);
+      padding: 12px 4%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+      box-shadow: var(--shadow);
+    }
+
+    /* Scrolled State: Permanently Docked Left Sidebar (Until Page Refresh) */
+    body.sidebar-locked .site-nav {
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: 250px;
+      height: 100vh;
+      border-right: var(--border-accent);
+      padding: 28px 18px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-shadow: var(--shadow);
+    }
+
+    .brand-box {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand-title {
+      font-family: var(--font-heading);
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      color: var(--accent);
+      text-transform: uppercase;
+    }
+
+    .brand-sub {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      color: var(--text-muted);
+      letter-spacing: 0.06em;
+    }
+
+    /* Primary Page Buttons */
+    .nav-pages {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    body.sidebar-locked .nav-pages {
+      flex-direction: column;
+      margin: 28px 0 auto;
+    }
+
+    .nav-btn {
+      background: var(--bg-card);
+      color: var(--text-main);
+      border: var(--border);
+      border-radius: var(--radius);
+      padding: 10px 16px;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      cursor: pointer;
+      text-align: left;
+      transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+    }
+
+    .nav-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      transform: translateY(-1px);
+    }
+
+    .nav-btn.active {
+      background: var(--accent);
+      color: var(--bg-main);
+      border-color: var(--accent);
+      font-weight: 700;
+    }
+
+    /* Bottom Format Switcher Menu */
+    .format-menu {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    body.sidebar-locked .format-menu {
+      flex-direction: column;
+      align-items: stretch;
+      border-top: var(--border);
+      padding-top: 16px;
+    }
+
+    .format-label {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 4px;
+      display: none;
+    }
+
+    body.sidebar-locked .format-label {
+      display: block;
+    }
+
+    .format-btn {
+      background: var(--bg-panel);
+      color: var(--text-muted);
+      border: var(--border);
+      border-radius: var(--radius);
+      padding: 7px 10px;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      cursor: pointer;
+      text-align: left;
+      transition: border-color 0.15s ease, color 0.15s ease;
+    }
+
+    .format-btn:hover,
+    .format-btn.active-format {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* ==========================================================================
+       4. LAVISH BUTTON STYLING (ACTIVE IN LUXURY FORMAT)
+       ========================================================================== */
+    [data-theme="luxury"] .nav-btn,
+    [data-theme="luxury"] .format-btn,
+    [data-theme="luxury"] .action-btn {
+      background: linear-gradient(145deg, #1b1509 0%, #0d1f18 50%, #241b0b 100%);
+      border: 2px double #f3cf7a;
+      color: #f3cf7a;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25), 0 4px 10px rgba(0, 0, 0, 0.6);
+      font-family: var(--font-heading);
+      letter-spacing: 0.12em;
+    }
+
+    [data-theme="luxury"] .nav-btn.active,
+    [data-theme="luxury"] .format-btn.active-format,
+    [data-theme="luxury"] .nav-btn:hover,
+    [data-theme="luxury"] .action-btn:hover {
+      background: linear-gradient(135deg, #b8862d 0%, #fcf6ba 50%, #9c6f1e 100%);
+      color: #040b08;
+      border-color: #ffffff;
+      font-weight: 700;
+    }
+
+    /* ==========================================================================
+       5. TRANSIENT HORROR BAR & CREEPING WEBS / SPIDERS / WORMS
+       ========================================================================== */
+    .transient-banner {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 300;
+      background-color: #140d0c;
+      border-bottom: 2px solid #9e2a2b;
+      color: #d6d0be;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      transform: translateY(-110%);
+      transition: transform 0.3s ease;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.9);
+    }
+
+    .transient-banner.show {
+      transform: translateY(0);
+    }
+
+    .transient-banner strong {
+      color: #5ce62e;
+    }
+
+    .horror-overlay {
+      display: var(--horror-display);
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 90;
+      overflow: hidden;
+    }
+
+    .svg-web-tr {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 240px;
+      height: 240px;
+      stroke: rgba(214, 208, 190, 0.28);
+      fill: none;
+      stroke-width: 1.2;
+    }
+
+    .svg-web-bl {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 220px;
+      height: 220px;
+      stroke: rgba(214, 208, 190, 0.22);
+      fill: none;
+      stroke-width: 1.2;
+      transform: scale(-1, -1);
+    }
+
+    .svg-spider {
+      position: absolute;
+      top: -10px;
+      right: 75px;
+      animation: spiderBob 6s ease-in-out infinite alternate;
+    }
+
+    @keyframes spiderBob {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(110px); }
+    }
+
+    .svg-worms {
+      position: absolute;
+      bottom: 12px;
+      right: 20px;
+      width: 180px;
+      height: 80px;
+    }
+
+    .worm-line {
+      fill: none;
+      stroke: #9e2a2b;
+      stroke-width: 3.5;
+      stroke-linecap: round;
+      stroke-dasharray: 24 10;
+      animation: wormCrawl 3.5s linear infinite;
+    }
+
+    .worm-line.secondary {
+      stroke: #5c6349;
+      stroke-width: 2.5;
+      animation-direction: reverse;
+    }
+
+    @keyframes wormCrawl {
+      from { stroke-dashoffset: 0; }
+      to { stroke-dashoffset: 68; }
+    }
+
+    /* ==========================================================================
+       6. MAIN CONTENT AREA & CARDS
+       ========================================================================== */
+    .content-wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 120px 5% 80px;
+      transition: margin-left 0.25s ease, padding 0.25s ease;
+    }
+
+    body.sidebar-locked .content-wrap {
+      margin-left: 250px;
+      padding: 50px 5% 80px;
+    }
+
+    .page-section {
+      display: none;
+    }
+
+    .page-section.active-page {
+      display: block;
+    }
+
+    .section-panel {
+      background-color: var(--bg-panel);
+      border: var(--border);
+      border-radius: var(--radius);
+      padding: 32px;
+      margin-bottom: 28px;
+      box-shadow: var(--shadow);
+    }
+
+    .eyebrow {
+      font-family: var(--font-mono);
+      font-size: 0.74rem;
+      color: var(--accent);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    .main-title {
+      font-family: var(--font-heading);
+      font-size: clamp(2rem, 4.5vw, 3.4rem);
+      line-height: 1.15;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+
+    .lead-text {
+      color: var(--text-muted);
+      font-size: 1.05rem;
+      max-width: 68ch;
+    }
+
+    .status-pill {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 7px 13px;
+      background-color: var(--bg-card);
+      border: var(--border-accent);
+      border-radius: var(--radius);
+      font-family: var(--font-mono);
+      font-size: 0.74rem;
+      color: var(--accent);
+    }
+
+    /* ==========================================================================
+       7. PAGE 1: SONG RECOMMENDATIONS
+       ========================================================================== */
+    .songs-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 18px;
+      margin-top: 22px;
+    }
+
+    .song-item {
+      background-color: var(--bg-card);
+      border: var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 12px;
+      transition: border-color 0.15s ease, transform 0.15s ease;
+    }
+
+    .song-item:hover {
+      border-color: var(--accent);
+      transform: translateY(-2px);
+    }
+
+    .song-number {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--accent);
+      letter-spacing: 0.08em;
+    }
+
+    .song-name {
+      font-family: var(--font-heading);
+      font-size: 1.2rem;
+      margin-top: 4px;
+    }
+
+    .song-artist {
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      color: var(--text-muted);
+    }
+
+    .song-desc {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      border-left: 2px solid var(--accent);
+      padding-left: 10px;
+    }
+
+    /* ==========================================================================
+       8. PAGE 2: ARTWORK SHOWCASE
+       ========================================================================== */
+    .artwork-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+      gap: 22px;
+      margin-top: 22px;
+    }
+
+    .art-item {
+      background-color: var(--bg-card);
+      border: var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      cursor: pointer;
+      transition: border-color 0.15s ease, transform 0.15s ease;
+    }
+
+    .art-item:hover {
+      border-color: var(--accent);
+      transform: translateY(-3px);
+    }
+
+    .art-thumb {
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      background-color: var(--bg-main);
+      border-bottom: var(--border);
+      overflow: hidden;
+    }
+
+    .art-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .art-info {
+      padding: 18px;
+    }
+
+    .art-title {
+      font-family: var(--font-heading);
+      font-size: 1.15rem;
+      margin-bottom: 6px;
+    }
+
+    .art-desc {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+    }
+
+    /* Simple Instant Modal for Full-Size Art */
+    .art-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 400;
+      background-color: rgba(0, 0, 0, 0.92);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .art-modal.open {
+      display: flex;
+    }
+
+    .art-modal-box {
+      background-color: var(--bg-panel);
+      border: var(--border-accent);
+      border-radius: var(--radius);
+      padding: 20px;
+      max-width: 90vw;
+      max-height: 88vh;
+      text-align: center;
+    }
+
+    .art-modal-box img {
+      max-width: 100%;
+      max-height: 68vh;
+      display: block;
+      margin: 0 auto 14px;
+    }
+
+    /* ==========================================================================
+       9. PAGE 3: SOCIALS
+       ========================================================================== */
+    .socials-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 18px;
+      margin-top: 22px;
+    }
+
+    .social-link {
+      background-color: var(--bg-card);
+      border: var(--border);
+      border-radius: var(--radius);
+      padding: 22px;
+      color: var(--text-main);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: border-color 0.15s ease, transform 0.15s ease;
+    }
+
+    .social-link:hover {
+      border-color: var(--accent);
+      transform: translateX(4px);
+    }
+
+    .social-name {
+      font-family: var(--font-heading);
+      font-size: 1.15rem;
+      font-weight: 700;
+    }
+
+    .social-tag {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .action-btn {
+      background-color: var(--accent);
+      color: var(--bg-main);
+      border: var(--border-accent);
+      border-radius: var(--radius);
+      padding: 9px 18px;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+
+    /* ==========================================================================
+       10. MOBILE & SMALL SCREEN RESPONSIVENESS
+       ========================================================================== */
+    @media (max-width: 780px) {
+      body.sidebar-locked .site-nav {
+        width: 190px;
+        padding: 20px 12px;
+      }
+      body.sidebar-locked .content-wrap {
+        margin-left: 190px;
+        padding: 36px 4% 70px;
+      }
+    }
+
+    @media (max-width: 520px) {
+      body.sidebar-locked .site-nav {
+        width: 145px;
+        padding: 14px 8px;
+      }
+      body.sidebar-locked .content-wrap {
+        margin-left: 145px;
+        padding: 24px 12px 70px;
+      }
+      .brand-title { font-size: 0.9rem; }
+      .nav-btn { padding: 8px 10px; font-size: 0.7rem; }
+      .format-btn { font-size: 0.65rem; padding: 6px 8px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ==========================================================================
+       TRANSIENT BAR (APPEARS WHEN SCARY / HORROR FORMAT IS SELECTED)
+       Names both The Magnus Archives and The Outlast Trials in its style.
+       ========================================================================== -->
+  <div id="transientBar" class="transient-banner" role="status" aria-live="polite">
+    <div>
+      <strong>[THE MAGNUS ARCHIVES: STATEMENT OF THE CORRUPTION &amp; THE WEB]</strong>
+      // <span>THE OUTLAST TRIALS: MURKOFF TRIAL ENVIRONMENT ACTIVE</span>
+    </div>
+    <button id="dismissBanner" class="format-btn">CLOSE [X]</button>
+  </div>
+
+  <!-- ==========================================================================
+       SCARY FORMAT VISUALS (WEBS, DANGLING SPIDER, & WRITHING WORMS)
+       Pure lightweight inline SVG — zero external image load time.
+       ========================================================================== -->
+  <div class="horror-overlay" aria-hidden="true">
+    <!-- Top-Right Spiderweb -->
+    <svg class="svg-web-tr" viewBox="0 0 200 200">
+      <path d="M200,0 L0,0 M200,0 L15,65 M200,0 L55,125 M200,0 L115,175 M200,0 L200,200" />
+      <path d="M160,0 Q145,35 130,45 Q145,70 135,95 Q170,115 200,125" />
+      <path d="M115,0 Q100,50 75,75 Q95,115 90,150 Q145,165 200,180" />
+    </svg>
+
+    <!-- Dangling Spider -->
+    <svg class="svg-spider" width="42" height="160" viewBox="0 0 42 160">
+      <line x1="21" y1="0" x2="21" y2="125" stroke="rgba(214,208,190,0.4)" stroke-width="1" />
+      <circle cx="21" cy="133" r="6" fill="#0a0b08" stroke="#9e2a2b" stroke-width="1.5" />
+      <circle cx="21" cy="124" r="3.5" fill="#0a0b08" stroke="#d6d0be" stroke-width="1" />
+      <path d="M17,128 Q5,118 2,130 M16,132 Q3,130 1,142 M17,136 Q6,142 4,154" stroke="#d6d0be" stroke-width="1.2" fill="none" />
+      <path d="M25,128 Q37,118 40,130 M26,132 Q39,130 41,142 M25,136 Q36,142 38,154" stroke="#d6d0be" stroke-width="1.2" fill="none" />
+    </svg>
+
+    <!-- Bottom-Left Spiderweb -->
+    <svg class="svg-web-bl" viewBox="0 0 200 200">
+      <path d="M200,0 L0,0 M200,0 L20,60 M200,0 L50,120 M200,0 L110,170 M200,0 L200,200" />
+      <path d="M150,0 Q135,40 115,55 Q135,85 125,115 Q165,130 200,145" />
+    </svg>
+
+    <!-- Bottom-Right Writhing Worms -->
+    <svg class="svg-worms" viewBox="0 0 200 90">
+      <path class="worm-line" d="M10,70 Q45,30 80,65 T150,45 T190,75" />
+      <path class="worm-line secondary" d="M25,80 Q60,45 95,75 T165,55" />
+      <path class="worm-line" d="M5,45 Q50,15 90,45 T175,25" />
+    </svg>
+  </div>
+
+  <!-- ==========================================================================
+       ADAPTIVE NAVIGATION BAR / PERMANENT SIDEBAR
+       ========================================================================== -->
+  <header class="site-nav">
+    <div class="brand-box">
+      <span class="brand-title">SOVEREIGN // NEXUS</span>
+      <span id="navStateText" class="brand-sub">TOP BAR // SCROLL TO LOCK SIDEBAR</span>
+    </div>
+
+    <!-- 3 Primary Page Buttons -->
+    <nav class="nav-pages" aria-label="Primary Pages">
+      <button class="nav-btn active" data-page="page1">01. About &amp; Songs</button>
+      <button class="nav-btn" data-page="page2">02. Artwork</button>
+      <button class="nav-btn" data-page="page3">03. Socials</button>
+    </nav>
+
+    <!-- 3 Site Format Options at the Bottom of the Nav/Side Menu (+ Default Royal) -->
+    <div class="format-menu" aria-label="Site Format Options">
+      <span class="format-label">Site Formats</span>
+      <button class="format-btn" data-format="horror">I. Magnus &amp; Outlast</button>
+      <button class="format-btn" data-format="luxury">II. Lavish Luxury</button>
+      <button class="format-btn" data-format="bw">III. B&amp;W Basic</button>
+      <button class="format-btn active-format" data-format="royal">Reset: Dark Royal</button>
+    </div>
+  </header>
+
+  <!-- ==========================================================================
+       MAIN CONTENT CONTAINER
+       ========================================================================== -->
+  <main class="content-wrap">
+
+    <!-- ========================================================================
+         PAGE 1: NAME, SIMPLE DESCRIPTION, & SONG RECOMMENDATIONS
+         ======================================================================== -->
+    <section id="page1" class="page-section active-page">
+      <div class="section-panel">
+        <span class="eyebrow">PAGE 01 // IDENTITY</span>
+
+        <!-- ==================== EDIT YOUR NAME & BIO HERE ==================== -->
+        <h1 class="main-title">LUCAS</h1>
+        <p class="lead-text">
+          Welcome to my personal site and digital archive. I work across digital illustration, philosophy, and game scripting. Browse my current song rotation below, or use the navigation menu to explore my artwork and social links.
+        </p>
+        <!-- =================================================================== -->
+
+        <div id="scrollBadge" class="status-pill">
+          ↓ Scroll down slightly to lock the navigation bar to the side
+        </div>
+      </div>
+
+      <div class="section-panel">
+        <span class="eyebrow">AUDIO ROTATION // PLAYLIST</span>
+        <h2 style="font-family: var(--font-heading); font-size: 1.75rem; margin-bottom: 6px;">
+          SONG RECOMMENDATIONS
+        </h2>
+        <p style="color: var(--text-muted); font-size: 0.92rem;">
+          Favorite tracks and atmospheric pieces I recommend listening to.
+        </p>
+
+        <!-- ==================== ADD OR CHANGE SONGS HERE ====================
+             To add a new song:
+             1. Copy one complete <article class="song-item">...</article> block.
+             2. Paste it inside this <div class="songs-grid"> container.
+             3. Change the track title, artist name, and description.
+             ================================================================== -->
+        <div class="songs-grid">
+
+          <!-- SONG 1 -->
+          <article class="song-item">
+            <div>
+              <span class="song-number">TRACK // 01</span>
+              <h3 class="song-name">Gone Angels</h3>
+              <p class="song-artist">Mili</p>
+            </div>
+            <p class="song-desc">
+              Classical strings and piano blended with sharp narrative storytelling.
+            </p>
+          </article>
+
+          <!-- SONG 2 -->
+          <article class="song-item">
+            <div>
+              <span class="song-number">TRACK // 02</span>
+              <h3 class="song-name">Nocturne Op. 9 No. 2</h3>
+              <p class="song-artist">Frédéric Chopin</p>
+            </div>
+            <p class="song-desc">
+              Focused, expressive late-night instrumental atmosphere.
+            </p>
+          </article>
+
+          <!-- SONG 3 -->
+          <article class="song-item">
+            <div>
+              <span class="song-number">TRACK // 03</span>
+              <h3 class="song-name">Compass</h3>
+              <p class="song-artist">Mili</p>
+            </div>
+            <p class="song-desc">
+              Sweeping vocals and driving percussion that build steady momentum.
+            </p>
+          </article>
+
+          <!-- SONG 4 (Template slot ready for your next track) -->
+          <article class="song-item">
+            <div>
+              <span class="song-number">TRACK // 04</span>
+              <h3 class="song-name">Your Song Title Here</h3>
+              <p class="song-artist">Artist Name Here</p>
+            </div>
+            <p class="song-desc">
+              Replace this text in index.html with your own song recommendation note.
+            </p>
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================================
+         PAGE 2: ARTWORK GALLERY
+         ======================================================================== -->
+    <section id="page2" class="page-section">
+      <div class="section-panel">
+        <span class="eyebrow">PAGE 02 // GALLERY</span>
+        <h1 class="main-title">ARTWORK ARCHIVE</h1>
+        <p class="lead-text">
+          A collection of my digital drawings, studies, and visual projects. Click any artwork card to view it larger.
+        </p>
+
+        <!-- ==================== ADD OR CHANGE ARTWORK HERE ====================
+             HOW TO INSERT YOUR OWN ARTWORK IMAGES:
+             1. In your GitHub repository, upload your image files (e.g., "art1.png"
+                or "assets/art1.png").
+             2. In each <article class="art-item"> block below:
+                - Change data-img="..." to your image path (e.g., "assets/art1.png").
+                - Change <img src="..."> to the exact same path (e.g., "assets/art1.png").
+                - Change data-title="..." and <h3 class="art-title"> to your artwork's title.
+                - Change data-desc="..." and <p class="art-desc"> to your description.
+             3. To add more artwork slots, copy and paste an entire <article class="art-item"> block!
+             ==================================================================== -->
+        <div class="artwork-grid">
+
+          <!-- ARTWORK SLOT 1 -->
+          <article class="art-item"
+                   data-title="Artwork Title 01"
+                   data-desc="Digital illustration created in FireAlpaca."
+                   data-img="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 600'%3E%3Crect width='800' height='600' fill='%2312101d'/%3E%3Ccircle cx='400' cy='300' r='160' fill='none' stroke='%23cba358' stroke-width='3'/%3E%3Ctext x='400' y='305' fill='%23f0ece1' font-family='serif' font-size='24' text-anchor='middle'%3EReplace with assets/art-01.png%3C/text%3E%3C/svg%3E">
+            <div class="art-thumb">
+              <!-- CHANGE src BELOW TO YOUR IMAGE FILE PATH -->
+              <img src="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 600'%3E%3Crect width='800' height='600' fill='%2312101d'/%3E%3Ccircle cx='400' cy='300' r='160' fill='none' stroke='%23cba358' stroke-width='3'/%3E%3Ctext x='400' y='305' fill='%23f0ece1' font-family='serif' font-size='24' text-anchor='middle'%3EReplace with assets/art-01.png%3C/text%3E%3C/svg%3E"
+                   alt="Artwork 01" loading="lazy" decoding="async" />
+            </div>
+            <div class="art-info">
+              <h3 class="art-title">Artwork Title 01</h3>
+              <p class="art-desc">Digital illustration created in FireAlpaca.</p>
+            </div>
+          </article>
+
+          <!-- ARTWORK SLOT 2 -->
+          <article class="art-item"
+                   data-title="Artwork Title 02"
+                   data-desc="Character study and lighting composition."
+                   data-img="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 600'%3E%3Crect width='800' height='600' fill='%2312101d'/%3E%3Crect x='180' y='110' width='440' height='380' fill='none' stroke='%23cba358' stroke-width='3'/%3E%3Ctext x='400' y='305' fill='%23f0ece1' font-family='serif' font-size='24' text-anchor='middle'%3EReplace with assets/art-02.png%3C/text%3E%3C/svg%3E">
+            <div class="art-thumb">
+              <!-- CHANGE src BELOW TO YOUR IMAGE FILE PATH -->
+              <img src="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 600'%3E%3Crect width='800' height='600' fill='%2312101d'/%3E%3Crect x='180' y='110' width='440' height='380' fill='none' stroke='%23cba358' stroke-width='3'/%3E%3Ctext x='400' y='305' fill='%23f0ece1' font-family='serif' font-size='24' text-anchor='middle'%3EReplace with assets/art-02.png%3C/text%3E%3C/svg%3E"
+                   alt="Artwork 02" loading="lazy" decoding="async" />
+            </div>
+            <div class="art-info">
+              <h3 class="art-title">Artwork Title 02</h3>
+              <p class="art-desc">Character study and lighting composition.</p>
+            </div>
+          </article>
+
+          <!-- ARTWORK SLOT 3 -->
+          <article class="art-item"
+                   data-title="Artwork Title 03"
+                   data-desc="Concept sketch and symbolic layout."
+                   data-img="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 600'%3E%3Crect width='800' height='600' fill='%2312101d'/%3E%3Cpolygon points='400,110 600,470 200,470' fill='none' stroke='%23cba358' stroke-width='3'/%3E%3Ctext x='400' y='335' fill='%23f0ece1' font-family='serif' font-size='24' text-anchor='middle'%3EReplace with assets/art-03.png%3C/text%3E%3C/svg%3E">
+            <div class="art-thumb">
+              <!-- CHANGE src BELOW TO YOUR IMAGE FILE PATH -->
+              <img src="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 600'%3E%3Crect width='800' height='600' fill='%2312101d'/%3E%3Cpolygon points='400,110 600,470 200,470' fill='none' stroke='%23cba358' stroke-width='3'/%3E%3Ctext x='400' y='335' fill='%23f0ece1' font-family='serif' font-size='24' text-anchor='middle'%3EReplace with assets/art-03.png%3C/text%3E%3C/svg%3E"
+                   alt="Artwork 03" loading="lazy" decoding="async" />
+            </div>
+            <div class="art-info">
+              <h3 class="art-title">Artwork Title 03</h3>
+              <p class="art-desc">Concept sketch and symbolic layout.</p>
+            </div>
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================================
+         PAGE 3: SOCIALS
+         ======================================================================== -->
+    <section id="page3" class="page-section">
+      <div class="section-panel">
+        <span class="eyebrow">PAGE 03 // DIRECTORY</span>
+        <h1 class="main-title">SOCIALS &amp; LINKS</h1>
+        <p class="lead-text">
+          Where to find my profiles, repositories, and creative updates across the web.
+        </p>
+
+        <!-- ==================== ADD OR CHANGE SOCIALS HERE ====================
+             Replace the href="..." URLs and handle text with your own links.
+             Copy and paste any <a class="social-link"> block to add more platforms.
+             ==================================================================== -->
+        <div class="socials-list">
+
+          <a class="social-link" href="https://github.com/" target="_blank" rel="noopener">
+            <div>
+              <div class="social-name">GitHub</div>
+              <div class="social-tag">@your-username</div>
+            </div>
+            <span>↗</span>
+          </a>
+
+          <a class="social-link" href="https://steamcommunity.com/" target="_blank" rel="noopener">
+            <div>
+              <div class="social-name">Steam</div>
+              <div class="social-tag">Gaming Profile</div>
+            </div>
+            <span>↗</span>
+          </a>
+
+          <a class="social-link" href="https://instagram.com/" target="_blank" rel="noopener">
+            <div>
+              <div class="social-name">Instagram / Art</div>
+              <div class="social-tag">@your-art-handle</div>
+            </div>
+            <span>↗</span>
+          </a>
+
+          <a class="social-link" href="https://discord.com/" target="_blank" rel="noopener">
+            <div>
+              <div class="social-name">Discord</div>
+              <div class="social-tag">@your-discord-tag</div>
+            </div>
+            <span>↗</span>
+          </a>
+
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ==========================================================================
+       LIGHTWEIGHT ARTWORK VIEWER MODAL
+       ========================================================================== -->
+  <div id="artModal" class="art-modal" role="dialog" aria-modal="true" aria-label="Artwork Viewer">
+    <div class="art-modal-box">
+      <img id="modalImg" src="" alt="Full size artwork" />
+      <h3 id="modalTitle" style="font-family: var(--font-heading); margin-bottom: 4px;"></h3>
+      <p id="modalDesc" style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 14px;"></p>
+      <button id="closeModalBtn" class="action-btn">Close [ESC]</button>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       ULTRA-LIGHTWEIGHT VANILLA JAVASCRIPT
+       ========================================================================== -->
+  <script>
+    (function () {
+      // 1. One-Way Scroll Listener: Moves top nav permanently to sidebar until page refresh
+      const navStateText = document.getElementById("navStateText");
+      const scrollBadge = document.getElementById("scrollBadge");
+
+      function lockToSidebarOnScroll() {
+        if (window.scrollY > 35) {
+          document.body.classList.add("sidebar-locked");
+          if (navStateText) navStateText.textContent = "SIDEBAR LOCKED (REFRESH TO RESET)";
+          if (scrollBadge) scrollBadge.textContent = "✓ Sidebar locked for this session (refresh page to return to top)";
+          // Immediately remove listener so zero scroll CPU overhead remains
+          window.removeEventListener("scroll", lockToSidebarOnScroll);
+        }
+      }
+      window.addEventListener("scroll", lockToSidebarOnScroll, { passive: true });
+
+      // 2. Instant Page Switching
+      const pageButtons = document.querySelectorAll(".nav-btn[data-page]");
+      const pages = document.querySelectorAll(".page-section");
+
+      pageButtons.forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const target = btn.getAttribute("data-page");
+          pageButtons.forEach((b) => b.classList.remove("active"));
+          btn.classList.add("active");
+
+          pages.forEach((sec) => {
+            sec.classList.toggle("active-page", sec.id === target);
+          });
+        });
+      });
+
+      // 3. Site Format Switcher + Transient Magnus/Outlast Banner
+      const formatButtons = document.querySelectorAll(".format-btn[data-format]");
+      const transientBar = document.getElementById("transientBar");
+      const dismissBanner = document.getElementById("dismissBanner");
+      let bannerTimer = null;
+
+      formatButtons.forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const format = btn.getAttribute("data-format");
+          document.documentElement.setAttribute("data-theme", format);
+
+          formatButtons.forEach((b) => b.classList.remove("active-format"));
+          btn.classList.add("active-format");
+
+          clearTimeout(bannerTimer);
+          if (format === "horror") {
+            transientBar.classList.add("show");
+            bannerTimer = setTimeout(() => {
+              transientBar.classList.remove("show");
+            }, 7000);
+          } else {
+            transientBar.classList.remove("show");
+          }
+        });
+      });
+
+      if (dismissBanner) {
+        dismissBanner.addEventListener("click", () => {
+          transientBar.classList.remove("show");
+        });
+      }
+
+      // 4. Artwork Click-to-Enlarge Modal
+      const artItems = document.querySelectorAll(".art-item");
+      const artModal = document.getElementById("artModal");
+      const modalImg = document.getElementById("modalImg");
+      const modalTitle = document.getElementById("modalTitle");
+      const modalDesc = document.getElementById("modalDesc");
+      const closeModalBtn = document.getElementById("closeModalBtn");
+
+      artItems.forEach((item) => {
+        item.addEventListener("click", () => {
+          modalImg.src = item.getAttribute("data-img") || "";
+          modalTitle.textContent = item.getAttribute("data-title") || "";
+          modalDesc.textContent = item.getAttribute("data-desc") || "";
+          artModal.classList.add("open");
+        });
+      });
+
+      function closeArtModal() {
+        artModal.classList.remove("open");
+      }
+
+      closeModalBtn.addEventListener("click", closeArtModal);
+      artModal.addEventListener("click", (e) => {
+        if (e.target === artModal) closeArtModal();
+      });
+      window.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") closeArtModal();
+      });
+    })();
+  </script>
+</body>
+</html>
