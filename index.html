@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="base">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Archive</title>
+  <style>
+    :root {
+      --font-primary: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+      --font-mono: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+      --bg-canvas: #0c0d10;
+      --bg-panel: #16181d;
+      --bg-panel-accent: #21242b;
+      --text-main: #e6edf3;
+      --text-muted: #8b949e;
+      --border-color: #30363d;
+      --accent: #58a6ff;
+      --accent-danger: #f85149;
+      --tape-display: none;
+      --stamp-display: none;
+      --scanline-display: none;
+      --border-radius: 6px;
+      --sidebar-width: 260px;
+      --nav-height: 64px;
+      --transition-speed: 0.25s;
+    }
+
+    [data-theme="terminal"] {
+      --font-primary: var(--font-mono);
+      --bg-canvas: #000000;
+      --bg-panel: #0a0a0a;
+      --bg-panel-accent: #141414;
+      --text-main: #ffffff;
+      --text-muted: #777777;
+      --border-color: #ffffff;
+      --accent: #ffffff;
+      --accent-danger: #ffffff;
+      --tape-display: none;
+      --stamp-display: none;
+      --scanline-display: block;
+      --border-radius: 0px;
+    }
+
+    [data-theme="magnus"] {
+      --font-primary: 'Georgia', 'Palatino', serif;
+      --bg-canvas: #1e1915;
+      --bg-panel: #2b231d;
+      --bg-panel-accent: #382e26;
+      --text-main: #d8c8b8;
+      --text-muted: #9c8e80;
+      --border-color: #524337;
+      --accent: #c48b4f;
+      --accent-danger: #8a3324;
+      --tape-display: block;
+      --stamp-display: block;
+      --scanline-display: none;
+      --border-radius: 2px;
+    }
+
+    [data-theme="trials"] {
+      --font-primary: 'Arial Black', Impact, sans-serif;
+      --bg-canvas: #0b110e;
+      --bg-panel: #121c17;
+      --bg-panel-accent: #192720;
+      --text-main: #4ef2a3;
+      --text-muted: #2a7350;
+      --border-color: #305e45;
+      --accent: #d62828;
+      --accent-danger: #ff0000;
+      --tape-display: none;
+      --stamp-display: none;
+      --scanline-display: none;
+      --border-radius: 0px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      background-color: var(--bg-canvas);
+      color: var(--text-main);
+      font-family: var(--font-primary);
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    .crt-overlay {
+      display: var(--scanline-display);
+      pointer-events: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 9999;
+      background: linear-gradient(
+        rgba(18, 16, 16, 0) 50%, 
+        rgba(0, 0, 0, 0.4) 50%
+      ), linear-gradient(
+        90deg,
+        rgba(255, 0, 0, 0.03),
+        rgba(0, 255, 0, 0.01),
+        rgba(0, 0, 255, 0.03)
+      );
+      background-size: 100% 4px, 6px 100%;
+    }
+
+    #banner-toast {
+      position: fixed;
+      top: -60px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--bg-panel);
+      color: var(--accent);
+      border: 1px solid var(--border-color);
+      padding: 8px 20px;
+      font-size: 12px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      z-index: 10000;
+      transition: top 0.3s ease;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    }
+    #banner-toast.visible {
+      top: 15px;
+    }
+
+    #site-nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: var(--nav-height);
+      background-color: var(--bg-panel);
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      z-index: 1000;
+      transition: width var(--transition-speed) ease, height var(--transition-speed) ease;
+    }
+
+    #site-nav.locked-sidebar {
+      width: var(--sidebar-width);
+      height: 100vh;
+      border-bottom: none;
+      border-right: 1px solid var(--border-color);
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: flex-start;
+      padding: 32px 16px;
+    }
+
+    .brand-container {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    #site-nav.locked-sidebar .brand-container {
+      margin-bottom: 40px;
+      width: 100%;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .brand-icon {
+      height: 1.25rem;
+      width: 1.25rem;
+      fill: currentColor;
+    }
+    .brand-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      line-height: 1.25rem;
+      letter-spacing: -0.5px;
+    }
+    [data-theme="trials"] .brand-title {
+      background-color: var(--text-main);
+      color: var(--bg-canvas);
+      padding: 0 4px;
+      letter-spacing: 2px;
+    }
+
+    .nav-items {
+      display: flex;
+      list-style: none;
+      gap: 12px;
+    }
+    #site-nav.locked-sidebar .nav-items {
+      flex-direction: column;
+      width: 100%;
+      gap: 4px;
+    }
+    .nav-btn {
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px solid transparent;
+      padding: 8px 14px;
+      font-family: inherit;
+      font-size: 0.9rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      width: 100%;
+      text-align: left;
+      border-radius: var(--border-radius);
+      transition: all 0.2s ease;
+    }
+    .nav-btn:hover {
+      color: var(--text-main);
+      background-color: var(--bg-panel-accent);
+    }
+    .nav-btn.active {
+      color: var(--accent);
+      border-color: var(--border-color);
+      background-color: var(--bg-panel-accent);
+    }
+
+    .theme-controller {
+      display: flex;
+      gap: 4px;
+    }
+    #site-nav.locked-sidebar .theme-controller {
+      margin-top: auto;
+      width: 100%;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      padding-top: 16px;
+      border-top: 1px solid var(--border-color);
+    }
+    .theme-btn {
+      background: var(--bg-panel-accent);
+      color: var(--text-muted);
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius);
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      padding: 4px 8px;
+      cursor: pointer;
+      text-align: center;
+    }
+    .theme-btn:hover {
+      color: var(--text-main);
+    }
+
+    #view-viewport {
+      margin-top: var(--nav-height);
+      padding: 32px 24px;
+      min-height: calc(100vh - var(--nav-height));
+      max-width: 1000px;
+      margin-left: auto;
+      margin-right: auto;
+      transition: margin-left var(--transition-speed) ease;
+    }
+    body.sidebar-locked #view-viewport {
+      margin-top: 0;
+      margin-left: calc(var(--sidebar-width) + 32px);
+      margin-right: auto;
+      max-width: calc(100% - var(--sidebar-width) - 64px);
+    }
+
+    .spa-view {
+      display: none;
+    }
+    .spa-view.active {
+      display: block;
+    }
+
+    .bio-wrapper {
+      display: flex;
+      gap: 32px;
+      align-items: flex-start;
+      margin-bottom: 40px;
+    }
+    .bio-image-wrapper {
+      position: relative;
+      flex-shrink: 0;
+    }
+    .bio-image {
+      width: 180px;
+      height: 180px;
+      object-fit: cover;
+      border-radius: var(--border-radius);
+      border: 1px solid var(--border-color);
+      background-color: var(--bg-panel);
+    }
+    .tape-element {
+      display: var(--tape-display);
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%) rotate(-3deg);
+      width: 90px;
+      height: 24px;
+      background-color: rgba(230, 215, 180, 0.6);
+      border-left: 2px dashed rgba(255,255,255,0.4);
+      border-right: 2px dashed rgba(255,255,255,0.4);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    }
+    .bio-text {
+      flex-grow: 1;
+    }
+    .bio-text h2 {
+      margin-bottom: 12px;
+      font-size: 1.6rem;
+    }
+    .bio-text p {
+      color: var(--text-muted);
+      line-height: 1.6;
+      margin-bottom: 12px;
+    }
+
+    .audio-inventory {
+      margin-bottom: 40px;
+    }
+    .audio-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 12px;
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius);
+      margin-bottom: 8px;
+      background-color: var(--bg-panel);
+    }
+    .audio-meta {
+      width: 180px;
+      font-size: 0.85rem;
+    }
+    .audio-row audio {
+      flex-grow: 1;
+      height: 32px;
+    }
+
+    .interactive-triggers {
+      display: flex;
+      gap: 16px;
+    }
+    .trials-btn {
+      background-color: var(--bg-panel);
+      color: var(--text-main);
+      border: 1px solid var(--border-color);
+      padding: 12px 24px;
+      font-family: inherit;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      border-radius: var(--border-radius);
+      transition: all 0.2s ease;
+    }
+    .trials-btn:hover {
+      border-color: var(--accent-danger);
+    }
+    .trials-btn span:first-child {
+      font-weight: bold;
+    }
+    .trials-btn span:last-child {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+    .gallery-item {
+      position: relative;
+      aspect-ratio: 1;
+      overflow: hidden;
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius);
+      background-color: var(--bg-panel);
+    }
+    .gallery-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.3s ease;
+    }
+    .gallery-item:hover img {
+      transform: scale(1.05);
+    }
+    .gallery-overlay {
+      position: absolute;
+      inset: 0;
+      background-color: rgba(0, 0, 0, 0.85);
+      color: #ffffff;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      opacity: 0;
+      transition: opacity 0.25s ease;
+    }
+    .gallery-item:hover .gallery-overlay,
+    .gallery-item:focus-within .gallery-overlay {
+      opacity: 1;
+    }
+    .gallery-overlay p {
+      font-size: 0.85rem;
+      line-height: 1.4;
+      color: #cccccc;
+    }
+
+    .nexus-card {
+      border: 1px solid var(--border-color);
+      padding: 32px;
+      background-color: var(--bg-panel);
+      border-radius: var(--border-radius);
+      max-width: 600px;
+    }
+    .contact-line {
+      display: flex;
+      margin-bottom: 16px;
+      gap: 12px;
+    }
+    .contact-channel {
+      font-weight: bold;
+      width: 80px;
+      color: var(--accent);
+    }
+    .contact-val {
+      font-family: var(--font-mono);
+    }
+    .nexus-disclaimer {
+      margin-top: 24px;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      border-top: 1px solid var(--border-color);
+      padding-top: 12px;
+      line-height: 1.4;
+    }
+
+    .keypad-wrapper {
+      max-width: 240px;
+      margin: 40px auto;
+      text-align: center;
+    }
+    .keypad-display {
+      width: 100%;
+      height: 48px;
+      background: var(--bg-panel-accent);
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius);
+      color: var(--accent);
+      font-family: var(--font-mono);
+      font-size: 1.5rem;
+      text-align: center;
+      line-height: 48px;
+      letter-spacing: 8px;
+      margin-bottom: 16px;
+    }
+    .keypad-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+    .key-btn {
+      padding: 16px 0;
+      font-family: var(--font-mono);
+      font-size: 1.2rem;
+      background: var(--bg-panel);
+      color: var(--text-main);
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius);
+      cursor: pointer;
+    }
+    .key-btn:active {
+      background: var(--bg-panel-accent);
+    }
+    #vault-payload {
+      display: none;
+      padding: 32px;
+      border: 1px dashed var(--border-color);
+      border-radius: var(--border-radius);
+      background-color: var(--bg-panel);
+      min-height: 300px;
+    }
+
+    @media (max-width: 768px) {
+      .gallery-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .bio-wrapper {
+        flex-direction: column;
+      }
+      #site-nav.locked-sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+        border-right: none;
+        border-bottom: 1px solid var(--border-color);
+      }
+      body.sidebar-locked #view-viewport {
+        margin-left: auto;
+        margin-right: auto;
+        max-width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="crt-overlay"></div>
+  <div id="banner-toast">THEME UPDATED</div>
+
+  <nav id="site-nav">
+    <div class="brand-container">
+      <svg class="brand-icon" viewBox="0 0 24 24">
+        <path d="M19.5 21a3 3 0 0 0 3-3v-4.5a3 3 0 0 0-3-3h-1.5V4.5a1.5 1.5 0 0 0-1.5-1.5h-7.5L7.5 1.5H3A1.5 1.5 0 0 0 1.5 3v15a3 3 0 0 0 3 3h15zm-15-1.5a1.5 1.5 0 0 1-1.5-1.5V4.5h3.879l1.5 1.5H16.5v4.5H4.5a3 3 0 0 0-3 3V18a1.5 1.5 0 0 1 1.5 1.5h15a1.5 1.5 0 0 1 1.5-1.5v-4.5a1.5 1.5 0 0 0-1.5-1.5h-15z"/>
+      </svg>
+      <span class="brand-title">Archive</span>
+    </div>
+
+    <ul class="nav-items">
+      <li><button class="nav-btn active" data-target="view-bio">Profile</button></li>
+      <li><button class="nav-btn" data-target="view-visuals">Visuals</button></li>
+      <li><button class="nav-btn" data-target="view-nexus">Nexus</button></li>
+      <li><button class="nav-btn" data-target="view-vault">Vault</button></li>
+    </ul>
+
+    <div class="theme-controller">
+      <button class="theme-btn" data-set-theme="base" title="Base Layout">SYS</button>
+      <button class="theme-btn" data-set-theme="terminal" title="Monochrome CRT">CRT</button>
+      <button class="theme-btn" data-set-theme="magnus" title="Magnus Archives">TMA</button>
+      <button class="theme-btn" data-set-theme="trials" title="Murkoff Clinical">RBX</button>
+    </div>
+  </nav>
+
+  <main id="view-viewport">
+
+    <section id="view-bio" class="spa-view active">
+      <div class="bio-wrapper">
+        <div class="bio-image-wrapper">
+          <div class="tape-element"></div>
+          <img src="data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22180%22%20height%3D%22180%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20180%20180%22%3E%3Crect%20fill%3D%22%2321242b%22%20width%3D%22180%22%20height%3D%22180%22%2F%3E%3Ccircle%20cx%3D%2290%22%20cy%3D%2270%22%20r%3D%2235%22%20fill%3D%22%2330363d%22%2F%3E%3Cpath%20d%3D%22M40%20150%20c0%20-30%2025%20-45%2050%20-45%20s50%2015%2050%2045%20z%22%20fill%3D%22%2330363d%22%2F%3E%3C%2Fsvg%3E" alt="Avatar" class="bio-image" />
+        </div>
+        <div class="bio-text">
+          <h2>Identity Context</h2>
+          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec odio. Praesent libero. Sed cursus ante dapibus diam. Sed nisi. Nulla quis sem at nibh elementum imperdiet.</p>
+          <p>Duis sagittis ipsum. Praesent mauris. Fusce nec tellus sed augue semper porta. Mauris massa. Vestibulum lacinia arcu eget nulla. Class aptent taciti sociosqu ad litora torquent per conubia nostra.</p>
+        </div>
+      </div>
+
+      <div class="audio-inventory">
+        <div class="audio-row">
+          <div class="audio-meta">Signal Track 01</div>
+          <audio controls preload="none">
+            <source src="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=" type="audio/wav" />
+          </audio>
+        </div>
+        <div class="audio-row">
+          <div class="audio-meta">Signal Track 02</div>
+          <audio controls preload="none">
+            <source src="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=" type="audio/wav" />
+          </audio>
+        </div>
+        <div class="audio-row">
+          <div class="audio-meta">Signal Track 03</div>
+          <audio controls preload="none">
+            <source src="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=" type="audio/wav" />
+          </audio>
+        </div>
+        <div class="audio-row">
+          <div class="audio-meta">Signal Track 04</div>
+          <audio controls preload="none">
+            <source src="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=" type="audio/wav" />
+          </audio>
+        </div>
+        <div class="audio-row">
+          <div class="audio-meta">Signal Track 05</div>
+          <audio controls preload="none">
+            <source src="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=" type="audio/wav" />
+          </audio>
+        </div>
+      </div>
+
+      <div class="interactive-triggers">
+        <button class="trials-btn" id="trigger-franco">
+          <span>Franco</span>
+          <span>"You'd hit a fucking baby?"</span>
+        </button>
+        <button class="trials-btn" id="trigger-liliya">
+          <span>Liliya</span>
+          <span>"Together, we egregore."</span>
+        </button>
+      </div>
+      <audio id="audio-franco" preload="auto">
+        <source src="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=" type="audio/wav" />
+      </audio>
+      <audio id="audio-liliya" preload="auto">
+        <source src="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=" type="audio/wav" />
+      </audio>
+    </section>
+
+    <section id="view-visuals" class="spa-view">
+      <div class="gallery-grid">
+        <div class="gallery-item">
+          <img src="data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22400%22%20height%3D%22400%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Crect%20fill%3D%22%231a1a1a%22%20width%3D%22400%22%20height%3D%22400%22%2F%3E%3Ctext%20fill%3D%22%23444%22%20x%3D%2250%25%22%20y%3D%2250%25%22%20dominant-baseline%3D%22middle%22%20text-anchor%3D%22middle%22%3E01%3C%2Ftext%3E%3C%2Fsvg%3E" alt="Archive Asset" />
+          <div class="gallery-overlay"><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p></div>
+        </div>
+        <div class="gallery-item">
+          <img src="data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22400%22%20height%3D%22400%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Crect%20fill%3D%22%231f1f1f%22%20width%3D%22400%22%20height%3D%22400%22%2F%3E%3Ctext%20fill%3D%22%23444%22%20x%3D%2250%25%22%20y%3D%2250%25%22%20dominant-baseline%3D%22middle%22%20text-anchor%3D%22middle%22%3E02%3C%2Ftext%3E%3C%2Fsvg%3E" alt="Archive Asset" />
+          <div class="gallery-overlay"><p>Pellentesque habitant morbi tristique senectus et netus.</p></div>
+        </div>
+        <div class="gallery-item">
+          <img src="data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22400%22%20height%3D%22400%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Crect%20fill%3D%22%23161616%22%20width%3D%22400%22%20height%3D%22400%22%2F%3E%3Ctext%20fill%3D%22%23444%22%20x%3D%2250%25%22%20y%3D%2250%25%22%20dominant-baseline%3D%22middle%22%20text-anchor%3D%22middle%22%3E03%3C%2Ftext%3E%3C%2Fsvg%3E" alt="Archive Asset" />
+          <div class="gallery-overlay"><p>Aliquam erat volutpat. Ut tincidunt dui id interdum.</p></div>
+        </div>
+        <div class="gallery-item">
+          <img src="data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22400%22%20height%3D%22400%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Crect%20fill%3D%22%23222222%22%20width%3D%22400%22%20height%3D%22400%22%2F%3E%3Ctext%20fill%3D%22%23444%22%20x%3D%2250%25%22%20y%3D%2250%25%22%20dominant-baseline%3D%22middle%22%20text-anchor%3D%22middle%22%3E04%3C%2Ftext%3E%3C%2Fsvg%3E" alt="Archive Asset" />
+          <div class="gallery-overlay"><p>Fusce dapibus, tellus ac cursus commodo, tortor mauris.</p></div>
+        </div>
+        <div class="gallery-item">
+          <img src="data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22400%22%20height%3D%22400%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Crect%20fill%3D%22%23191919%22%20width%3D%22400%22%20height%3D%22400%22%2F%3E%3Ctext%20fill%3D%22%23444%22%20x%3D%2250%25%22%20y%3D%2250%25%22%20dominant-baseline%3D%22middle%22%20text-anchor%3D%22middle%22%3E05%3C%2Ftext%3E%3C%2Fsvg%3E" alt="Archive Asset" />
+          <div class="gallery-overlay"><p>Vestibulum id ligula porta felis euismod semper.</p></div>
+        </div>
+        <div class="gallery-item">
+          <img src="data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22400%22%20height%3D%22400%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Crect%20fill%3D%22%231c1c1c%22%20width%3D%22400%22%20height%3D%22400%22%2F%3E%3Ctext%20fill%3D%22%23444%22%20x%3D%2250%25%22%20y%3D%2250%25%22%20dominant-baseline%3D%22middle%22%20text-anchor%3D%22middle%22%3E06%3C%2Ftext%3E%3C%2Fsvg%3E" alt="Archive Asset" />
+          <div class="gallery-overlay"><p>Cras justo odio, dapibus ac facilisis in, egestas eget.</p></div>
+        </div>
+        <div class="gallery-item">
+          <img src="data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22400%22%20height%3D%22400%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Crect%20fill%3D%22%23141414%22%20width%3D%22400%22%20height%3D%22400%22%2F%3E%3Ctext%20fill%3D%22%23444%22%20x%3D%2250%25%22%20y%3D%2250%25%22%20dominant-baseline%3D%22middle%22%20text-anchor%3D%22middle%22%3E07%3C%2Ftext%3E%3C%2Fsvg%3E" alt="Archive Asset" />
+          <div class="gallery-overlay"><p>Integer posuere erat a ante venenatis dapibus posuere.</p></div>
+        </div>
+        <div class="gallery-item">
+          <img src="data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22400%22%20height%3D%22400%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Crect%20fill%3D%22%231d1d1d%22%20width%3D%22400%22%20height%3D%22400%22%2F%3E%3Ctext%20fill%3D%22%23444%22%20x%3D%2250%25%22%20y%3D%2250%25%22%20dominant-baseline%3D%22middle%22%20text-anchor%3D%22middle%22%3E08%3C%2Ftext%3E%3C%2Fsvg%3E" alt="Archive Asset" />
+          <div class="gallery-overlay"><p>Praesent commodo cursus magna, vel scelerisque nisl.</p></div>
+        </div>
+        <div class="gallery-item">
+          <img src="data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22400%22%20height%3D%22400%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Crect%20fill%3D%22%23181818%22%20width%3D%22400%22%20height%3D%22400%22%2F%3E%3Ctext%20fill%3D%22%23444%22%20x%3D%2250%25%22%20y%3D%2250%25%22%20dominant-baseline%3D%22middle%22%20text-anchor%3D%22middle%22%3E09%3C%2Ftext%3E%3C%2Fsvg%3E" alt="Archive Asset" />
+          <div class="gallery-overlay"><p>Morbi leo risus, porta ac consectetur ac, vestibulum at.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="view-nexus" class="spa-view">
+      <div class="nexus-card">
+        <div class="contact-line">
+          <span class="contact-channel">DISCORD</span>
+          <span class="contact-val">officalchilledpozen</span>
+        </div>
+        <div class="contact-line">
+          <span class="contact-channel">GITHUB</span>
+          <span class="contact-val">prozelyte</span>
+        </div>
+        <div class="contact-line">
+          <span class="contact-channel">EMAIL</span>
+          <span class="contact-val">frozon.ponzo@gmail.com</span>
+        </div>
+        <p class="nexus-disclaimer">
+          Note: Contacting must be direct. Do not use the information posted here for anything other than direct communication.
+        </p>
+      </div>
+    </section>
+
+    <section id="view-vault" class="spa-view">
+      <div id="vault-lock">
+        <div class="keypad-wrapper">
+          <div class="keypad-display" id="keypad-readout">----</div>
+          <div class="keypad-grid">
+            <button class="key-btn" data-key="1">1</button>
+            <button class="key-btn" data-key="2">2</button>
+            <button class="key-btn" data-key="3">3</button>
+            <button class="key-btn" data-key="4">4</button>
+            <button class="key-btn" data-key="5">5</button>
+            <button class="key-btn" data-key="6">6</button>
+            <button class="key-btn" data-key="7">7</button>
+            <button class="key-btn" data-key="8">8</button>
+            <button class="key-btn" data-key="9">9</button>
+            <button class="key-btn" data-key="C">C</button>
+            <button class="key-btn" data-key="0">0</button>
+            <button class="key-btn" data-key="E">E</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================================================================= -->
+      <!-- VAULT INJECTION ZONE: FUTURE CONTENT REPOSITORY                   -->
+      <!-- INSERT CUSTOM DOM MODULES, EMBEDDED FRAMES, OR PRIVATE LOGS HERE -->
+      <!-- ================================================================= -->
+      <div id="vault-payload">
+        <!-- START OF EXPANDABLE REGION -->
+        
+        <!-- END OF EXPANDABLE REGION -->
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    (function () {
+      'use strict';
+
+      var navElement = document.getElementById('site-nav');
+      var bodyElement = document.body;
+      var hasLockedSidebar = false;
+
+      window.addEventListener('scroll', function () {
+        if (!hasLockedSidebar && window.scrollY > 40) {
+          hasLockedSidebar = true;
+          navElement.classList.add('locked-sidebar');
+          bodyElement.classList.add('sidebar-locked');
+        }
+      });
+
+      var navButtons = document.querySelectorAll('.nav-btn');
+      var viewPanels = document.querySelectorAll('.spa-view');
+
+      navButtons.forEach(function (button) {
+        button.addEventListener('click', function () {
+          var targetId = this.getAttribute('data-target');
+
+          navButtons.forEach(function (btn) {
+            btn.classList.remove('active');
+          });
+          viewPanels.forEach(function (panel) {
+            panel.classList.remove('active');
+          });
+
+          this.classList.add('active');
+          var activePanel = document.getElementById(targetId);
+          if (activePanel) {
+            activePanel.classList.add('active');
+          }
+        });
+      });
+
+      var themeToast = document.getElementById('banner-toast');
+      var themeButtons = document.querySelectorAll('[data-set-theme]');
+      var toastTimer = null;
+
+      var themeOrigins = {
+        'base': 'System Default: Minimal Archivist',
+        'terminal': 'Monochrome Terminal: CRT Scanline Output',
+        'magnus': 'The Magnus Archives: Rusty Quill Ltd.',
+        'trials': 'The Outlast Trials: Red Barrels'
+      };
+
+      function triggerToast(themeKey) {
+        if (toastTimer) {
+          clearTimeout(toastTimer);
+        }
+        themeToast.textContent = themeOrigins[themeKey] || 'THEME UPDATED';
+        themeToast.classList.add('visible');
+        toastTimer = setTimeout(function () {
+          themeToast.classList.remove('visible');
+        }, 3200);
+      }
+
+      themeButtons.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var selectedTheme = this.getAttribute('data-set-theme');
+          document.documentElement.setAttribute('data-theme', selectedTheme);
+          triggerToast(selectedTheme);
+        });
+      });
+
+      function setupAudioTrigger(buttonId, audioId) {
+        var button = document.getElementById(buttonId);
+        var audio = document.getElementById(audioId);
+        if (button && audio) {
+          button.addEventListener('click', function () {
+            audio.currentTime = 0;
+            audio.play().catch(function () {});
+          });
+        }
+      }
+
+      setupAudioTrigger('trigger-franco', 'audio-franco');
+      setupAudioTrigger('trigger-liliya', 'audio-liliya');
+
+      var enteredCode = '';
+      var secretCode = '1139';
+      var keypadReadout = document.getElementById('keypad-readout');
+      var vaultLock = document.getElementById('vault-lock');
+      var vaultPayload = document.getElementById('vault-payload');
+      var keyButtons = document.querySelectorAll('.key-btn');
+
+      function updateKeypadDisplay() {
+        if (enteredCode.length === 0) {
+          keypadReadout.textContent = '----';
+        } else {
+          var mask = '';
+          for (var i = 0; i < 4; i++) {
+            mask += enteredCode[i] ? '*' : '-';
+          }
+          keypadReadout.textContent = mask;
+        }
+      }
+
+      keyButtons.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var key = this.getAttribute('data-key');
+
+          if (key === 'C') {
+            enteredCode = '';
+            updateKeypadDisplay();
+            return;
+          }
+
+          if (key === 'E') {
+            if (enteredCode === secretCode) {
+              vaultLock.style.display = 'none';
+              vaultPayload.style.display = 'block';
+            } else {
+              keypadReadout.textContent = 'ERR';
+              enteredCode = '';
+              setTimeout(updateKeypadDisplay, 800);
+            }
+            return;
+          }
+
+          if (enteredCode.length < 4) {
+            enteredCode += key;
+            updateKeypadDisplay();
+          }
+
+          if (enteredCode.length === 4) {
+            if (enteredCode === secretCode) {
+              vaultLock.style.display = 'none';
+              vaultPayload.style.display = 'block';
+            } else {
+              setTimeout(function () {
+                keypadReadout.textContent = 'ERR';
+                enteredCode = '';
+                setTimeout(updateKeypadDisplay, 800);
+              }, 200);
+            }
+          }
+        });
+      });
+    })();
+  </script>
+</body>
+</html>
