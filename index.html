@@ -1,0 +1,1733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>INDEX // TERMINAL</title>
+  <style>
+    /* ==========================================================================
+       CORE RESET & STRUCTURAL VARIABLES
+       ========================================================================== */
+    :root {
+      --bg-primary: #070b14;
+      --bg-secondary: #0f172a;
+      --bg-card: #131d36;
+      --text-primary: #e2e8f0;
+      --text-muted: #64748b;
+      --accent-primary: #3b82f6;
+      --accent-secondary: #1d4ed8;
+      --border-color: #1e293b;
+      --font-main: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-mono: 'Courier New', Courier, monospace;
+      --box-radius: 8px;
+      --box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.7);
+      --transition-speed: 0.3s;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden; /* Main scroll is handled inside #viewport-scroll-container */
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: var(--font-main);
+      transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease;
+    }
+
+    /* ==========================================================================
+       SCROLL CONTAINER & TOP SCROLL WHEEL INDICATOR
+       ========================================================================== */
+    #viewport-scroll-container {
+      width: 100%;
+      height: 100vh;
+      overflow-y: scroll;
+      overflow-x: hidden;
+      position: relative;
+      scroll-behavior: smooth;
+    }
+
+    /* Custom Scrollbar */
+    #viewport-scroll-container::-webkit-scrollbar {
+      width: 10px;
+    }
+    #viewport-scroll-container::-webkit-scrollbar-track {
+      background: var(--bg-primary);
+      border-left: 1px solid var(--border-color);
+    }
+    #viewport-scroll-container::-webkit-scrollbar-thumb {
+      background: var(--accent-primary);
+      border-radius: 5px;
+    }
+
+    /* Top Area Visual Scroll Wheel Widget */
+    #top-scroll-wheel-bar {
+      position: sticky;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 36px;
+      background: rgba(7, 11, 20, 0.85);
+      backdrop-filter: blur(6px);
+      border-bottom: 1px solid var(--border-color);
+      z-index: 900;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      padding: 0 60px;
+    }
+
+    .wheel-housing {
+      width: 22px;
+      height: 28px;
+      border: 2px solid var(--accent-primary);
+      border-radius: 11px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding-top: 3px;
+      position: relative;
+      background: rgba(0, 0, 0, 0.4);
+    }
+
+    .wheel-gear {
+      width: 4px;
+      height: 8px;
+      background: var(--accent-primary);
+      border-radius: 2px;
+      transition: transform 0.1s linear;
+    }
+
+    .scroll-track-line {
+      flex: 1;
+      max-width: 400px;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--border-color);
+      border-radius: 3px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    #scroll-progress-fill {
+      width: 0%;
+      height: 100%;
+      background: var(--accent-primary);
+      transition: width 0.08s ease-out;
+    }
+
+    /* ==========================================================================
+       CAMERA BUTTON (PLAIN VIEW AT ALL TIMES)
+       ========================================================================== */
+    #persistent-camera-btn {
+      position: fixed;
+      top: 48px;
+      right: 20px;
+      z-index: 2500;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--bg-card);
+      border: 2px solid var(--accent-primary);
+      color: var(--text-primary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+      transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    #persistent-camera-btn:hover {
+      transform: scale(1.08);
+      background: var(--accent-secondary);
+      box-shadow: 0 0 15px var(--accent-primary);
+    }
+
+    #persistent-camera-btn:active {
+      transform: scale(0.95);
+    }
+
+    #persistent-camera-btn svg {
+      width: 22px;
+      height: 22px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* ==========================================================================
+       NAVIGATION BAR (TOP ON ENTRANCE -> LOCKS TO SIDE FOR REST OF SESSION)
+       ========================================================================== */
+    #main-nav {
+      z-index: 2000;
+      background: rgba(15, 23, 42, 0.92);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--border-color);
+      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* Entrance State: Small & Unassuming Top Bar */
+    #main-nav.nav-entrance-top {
+      position: relative;
+      margin: 14px auto 0 auto;
+      width: fit-content;
+      max-width: 92vw;
+      padding: 6px 12px;
+      border-radius: 999px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      box-shadow: var(--box-shadow);
+    }
+
+    /* Session Locked State: Small & Unassuming Side Dock */
+    #main-nav.nav-locked-side {
+      position: fixed;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 118px;
+      padding: 8px 6px;
+      border-radius: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      box-shadow: var(--box-shadow);
+    }
+
+    /* Hidden State when minimized to the side */
+    #main-nav.nav-hidden {
+      transform: translate(-160%, -50%) !important;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    #main-nav.nav-entrance-top.nav-hidden {
+      transform: translateY(-200%) !important;
+    }
+
+    .nav-section-group {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    #main-nav.nav-locked-side .nav-section-group {
+      flex-direction: column;
+      width: 100%;
+      gap: 3px;
+    }
+
+    .nav-divider {
+      width: 1px;
+      height: 18px;
+      background: var(--border-color);
+      margin: 0 4px;
+    }
+
+    #main-nav.nav-locked-side .nav-divider {
+      width: 85%;
+      height: 1px;
+      margin: 4px auto;
+    }
+
+    .nav-btn {
+      background: transparent;
+      color: var(--text-primary);
+      border: 1px solid transparent;
+      padding: 4px 8px;
+      font-size: 0.72rem;
+      font-family: var(--font-main);
+      border-radius: 4px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s ease;
+      text-align: center;
+    }
+
+    #main-nav.nav-locked-side .nav-btn {
+      width: 100%;
+      padding: 5px 4px;
+      font-size: 0.68rem;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .nav-btn:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: var(--accent-primary);
+    }
+
+    .nav-btn.active-page,
+    .nav-btn.active-theme {
+      background: var(--accent-primary);
+      color: #ffffff;
+      font-weight: 600;
+    }
+
+    #hide-nav-btn {
+      background: rgba(239, 68, 68, 0.15);
+      color: #fca5a5;
+      border: 1px solid rgba(239, 68, 68, 0.35);
+      font-size: 0.66rem;
+      padding: 3px 7px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    #hide-nav-btn:hover {
+      background: rgba(239, 68, 68, 0.35);
+    }
+
+    /* Separate Restore Button when Nav is Hidden */
+    #restore-nav-btn {
+      position: fixed;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 2100;
+      background: var(--bg-card);
+      color: var(--text-primary);
+      border: 1px solid var(--accent-primary);
+      padding: 8px 6px;
+      border-radius: 6px;
+      font-size: 0.7rem;
+      cursor: pointer;
+      display: none;
+      box-shadow: var(--box-shadow);
+      writing-mode: vertical-rl;
+      text-orientation: mixed;
+      letter-spacing: 1px;
+    }
+
+    #restore-nav-btn.visible {
+      display: block;
+    }
+
+    /* ==========================================================================
+       MAIN PAGE LAYOUT & CONTAINERS
+       ========================================================================== */
+    main {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 30px 24px 180px 24px;
+      min-height: 145vh; /* Ensures page is always scrollable so scroll events trigger */
+    }
+
+    .page-view {
+      display: none;
+      animation: fadeInPage 0.35s ease;
+    }
+
+    .page-view.active {
+      display: block;
+    }
+
+    @keyframes fadeInPage {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .content-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--box-radius);
+      padding: 28px;
+      margin-bottom: 28px;
+      box-shadow: var(--box-shadow);
+      position: relative;
+      transition: all var(--transition-speed) ease;
+    }
+
+    /* ==========================================================================
+       PAGE 1: FILE ICON + FILLER TEXT BOX
+       ========================================================================== */
+    .page1-layout {
+      display: flex;
+      align-items: flex-start;
+      gap: 28px;
+    }
+
+    @media (max-width: 650px) {
+      .page1-layout {
+        flex-direction: column;
+        align-items: center;
+      }
+    }
+
+    .file-icon-wrapper {
+      flex-shrink: 0;
+      width: 110px;
+      height: 135px;
+      background: var(--bg-secondary);
+      border: 2px solid var(--accent-primary);
+      border-radius: var(--box-radius);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      box-shadow: var(--box-shadow);
+    }
+
+    .file-icon-wrapper svg {
+      width: 58px;
+      height: 58px;
+      stroke: var(--accent-primary);
+      fill: none;
+      stroke-width: 1.75;
+    }
+
+    .file-icon-tag {
+      margin-top: 8px;
+      font-size: 0.7rem;
+      font-family: var(--font-mono);
+      color: var(--text-muted);
+      letter-spacing: 1px;
+    }
+
+    .filler-text-box {
+      flex: 1;
+      line-height: 1.75;
+      font-size: 0.98rem;
+    }
+
+    .filler-text-box p + p {
+      margin-top: 16px;
+    }
+
+    /* ==========================================================================
+       PAGE 2: 10 IMAGES GRID
+       ========================================================================== */
+    .image-grid-10 {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 22px;
+    }
+
+    .image-frame {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--box-radius);
+      padding: 12px;
+      position: relative;
+      box-shadow: var(--box-shadow);
+      transition: transform 0.25s ease;
+    }
+
+    .image-frame:hover {
+      transform: translateY(-4px);
+    }
+
+    .image-frame img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      display: block;
+      border-radius: calc(var(--box-radius) / 2);
+      background: #000;
+    }
+
+    .image-caption {
+      margin-top: 10px;
+      font-size: 0.78rem;
+      font-family: var(--font-mono);
+      color: var(--text-muted);
+      text-align: center;
+    }
+
+    /* ==========================================================================
+       PAGE 3: CURRENT INTERESTS LARGE TEXT BOX
+       ========================================================================== */
+    .large-interests-box {
+      min-height: 520px;
+      line-height: 1.8;
+      font-size: 1.02rem;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .interests-header {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--accent-primary);
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 10px;
+    }
+
+    /* ==========================================================================
+       PAGE 4: SOCIALS + TINY SECRET HINT
+       ========================================================================== */
+    .socials-card {
+      text-align: center;
+      padding: 48px 28px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .social-buttons-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+      width: 100%;
+    }
+
+    .social-launch-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px 28px;
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      border: 2px solid var(--accent-primary);
+      border-radius: var(--box-radius);
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.25s ease;
+      box-shadow: var(--box-shadow);
+    }
+
+    .social-launch-btn:hover {
+      background: var(--accent-primary);
+      color: #fff;
+      transform: translateY(-3px);
+    }
+
+    .social-launch-btn svg {
+      width: 22px;
+      height: 22px;
+      fill: currentColor;
+    }
+
+    /* Small text that is difficult to read */
+    .obscure-secret-hint {
+      margin-top: 75px;
+      font-size: 7.5px;
+      letter-spacing: 0.4px;
+      opacity: 0.22;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+      user-select: text;
+      filter: blur(0.35px);
+      transition: opacity 0.3s ease;
+    }
+
+    .obscure-secret-hint:hover {
+      opacity: 0.42;
+    }
+
+    /* ==========================================================================
+       PAGE 5: VAULT & KEYPAD (CODE: 1139)
+       ========================================================================== */
+    .vault-wrapper {
+      max-width: 420px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .vault-status-lamp {
+      display: inline-block;
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      letter-spacing: 2px;
+      margin-bottom: 18px;
+      background: rgba(239, 68, 68, 0.15);
+      color: #f87171;
+      border: 1px solid rgba(239, 68, 68, 0.4);
+    }
+
+    .vault-status-lamp.unlocked {
+      background: rgba(34, 197, 94, 0.18);
+      color: #4ade80;
+      border-color: rgba(34, 197, 94, 0.5);
+    }
+
+    .keypad-screen {
+      width: 100%;
+      height: 58px;
+      background: #05080f;
+      border: 2px solid var(--border-color);
+      border-radius: 6px;
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-mono);
+      font-size: 1.8rem;
+      letter-spacing: 10px;
+      color: #38bdf8;
+      box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.9);
+    }
+
+    .keypad-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .key-btn {
+      padding: 18px 0;
+      font-size: 1.25rem;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .key-btn:hover {
+      border-color: var(--accent-primary);
+      background: rgba(59, 130, 246, 0.15);
+    }
+
+    .key-btn:active {
+      transform: scale(0.95);
+    }
+
+    #vault-unlocked-compartment {
+      display: none;
+      margin-top: 28px;
+      animation: fadeInPage 0.5s ease;
+    }
+
+    #vault-unlocked-compartment.revealed {
+      display: block;
+    }
+
+    .gibberish-box {
+      font-family: var(--font-mono);
+      line-height: 1.7;
+      font-size: 0.95rem;
+      word-break: break-word;
+      text-align: left;
+    }
+
+    /* ==========================================================================
+       GLOWING GREEN SECRET NUMBERS ON EACH PAGE (CRV + P / CAMERA)
+       ========================================================================== */
+    .secret-page-cipher {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.9);
+      font-family: 'Courier New', Courier, monospace;
+      font-size: clamp(6rem, 18vw, 13rem);
+      font-weight: 900;
+      color: #22c55e;
+      text-shadow:
+        0 0 15px #22c55e,
+        0 0 35px #22c55e,
+        0 0 70px #15803d,
+        0 0 110px #4ade80;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 3200;
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    .secret-page-cipher.glowing-active {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+      animation: pulseGreenCipher 1.2s infinite alternate;
+    }
+
+    @keyframes pulseGreenCipher {
+      0% {
+        text-shadow: 0 0 15px #22c55e, 0 0 35px #22c55e, 0 0 70px #16a34a;
+      }
+      100% {
+        text-shadow: 0 0 25px #4ade80, 0 0 60px #22c55e, 0 0 110px #22c55e;
+      }
+    }
+
+    /* Static Flash Burst Overlay when P or Camera is triggered in CRV mode */
+    #static-burst-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 3500;
+      pointer-events: none;
+      opacity: 0;
+      background-color: #ffffff;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.85'/%3E%3C/svg%3E");
+      mix-blend-mode: hard-light;
+      transition: opacity 0.12s ease;
+    }
+
+    #static-burst-overlay.flash-now {
+      opacity: 0.95;
+    }
+
+    /* ==========================================================================
+       THEME 1: BASE (Sleek Blue-Black, Modern, Inoffensive)
+       ========================================================================== */
+    body.theme-base {
+      --bg-primary: #070b14;
+      --bg-secondary: #0f172a;
+      --bg-card: #111a2e;
+      --text-primary: #e2e8f0;
+      --text-muted: #64748b;
+      --accent-primary: #3b82f6;
+      --accent-secondary: #1d4ed8;
+      --border-color: #1e293b;
+    }
+
+    /* ==========================================================================
+       THEME 2: MAXIMALIST (Rich Multiple Colors, Deep Shadow Depth, Encoded Decor)
+       ========================================================================== */
+    body.theme-maximalist {
+      --bg-primary: #1a0526;
+      --bg-secondary: #320a47;
+      --bg-card: #27073a;
+      --text-primary: #fff3b0;
+      --text-muted: #f4a261;
+      --accent-primary: #ff007f;
+      --accent-secondary: #00f5d4;
+      --border-color: #ffd166;
+      --font-main: 'Georgia', 'Palatino Linotype', serif;
+      background-image:
+        radial-gradient(circle at 15% 20%, rgba(255, 0, 127, 0.32) 0%, transparent 40%),
+        radial-gradient(circle at 85% 80%, rgba(0, 245, 212, 0.28) 0%, transparent 45%),
+        repeating-linear-gradient(45deg, rgba(255, 209, 102, 0.06) 0px, rgba(255, 209, 102, 0.06) 14px, transparent 14px, transparent 28px),
+        url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%23ffd166' stroke-width='1' opacity='0.22'%3E%3Cpath d='M40 0 L80 40 L40 80 L0 40 Z'/%3E%3Ccircle cx='40' cy='40' r='16' stroke='%2300f5d4'/%3E%3Ccircle cx='40' cy='40' r='6' fill='%23ff007f'/%3E%3C/g%3E%3C/svg%3E");
+    }
+
+    body.theme-maximalist .content-box,
+    body.theme-maximalist .image-frame,
+    body.theme-maximalist .file-icon-wrapper {
+      border: 4px double #ffd166;
+      background: linear-gradient(135deg, rgba(58, 12, 163, 0.92), rgba(114, 9, 183, 0.88), rgba(247, 37, 133, 0.82));
+      box-shadow:
+        0 0 0 3px #00f5d4,
+        0 0 0 7px #ff007f,
+        0 16px 35px rgba(0, 0, 0, 0.85),
+        inset 0 0 25px rgba(255, 209, 102, 0.35);
+      border-radius: 14px;
+    }
+
+    /* Encoded Ornamental Corner Filigree on Every Box */
+    body.theme-maximalist .content-box::before,
+    body.theme-maximalist .image-frame::before {
+      content: "";
+      position: absolute;
+      inset: -6px;
+      pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100%25'%3E%3Crect x='2' y='2' width='18' height='18' fill='%23ffd166' stroke='%2300f5d4' stroke-width='2'/%3E%3Crect x='calc(100%25 - 20px)' y='2' width='18' height='18' fill='%23ffd166' stroke='%2300f5d4' stroke-width='2'/%3E%3Crect x='2' y='calc(100%25 - 20px)' width='18' height='18' fill='%23ffd166' stroke='%2300f5d4' stroke-width='2'/%3E%3Crect x='calc(100%25 - 20px)' y='calc(100%25 - 20px)' width='18' height='18' fill='%23ffd166' stroke='%2300f5d4' stroke-width='2'/%3E%3C/svg%3E");
+    }
+
+    /* Every Button Adorned with Encoded SVG Decor */
+    body.theme-maximalist button,
+    body.theme-maximalist .social-launch-btn {
+      background-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='%23ffd166' opacity='0.35' d='M12 2L15 9L22 12L15 15L12 22L9 15L2 12L9 9Z'/%3E%3C/svg%3E"),
+        linear-gradient(45deg, #ff007f, #7209b7, #4cc9f0);
+      background-size: 18px 18px, 100% 100%;
+      border: 2px ridge #ffd166 !important;
+      color: #fff3b0 !important;
+      text-shadow: 1px 1px 2px #000;
+      box-shadow: 0 0 10px #ff007f, inset 0 0 8px #00f5d4;
+    }
+
+    /* ==========================================================================
+       THEME 3: OLD TV AESTHETIC (CRV Mode: Gentle Buzz, Scanning White Line, Static)
+       ========================================================================== */
+    body.theme-crv {
+      --bg-primary: #050a06;
+      --bg-secondary: #0a140c;
+      --bg-card: #0c180f;
+      --text-primary: #b8e6c1;
+      --text-muted: #558b60;
+      --accent-primary: #4ade80;
+      --accent-secondary: #166534;
+      --border-color: #1e3a24;
+      --font-main: 'Courier New', Courier, monospace;
+    }
+
+    #crv-overlay-effects {
+      display: none;
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 2800;
+      overflow: hidden;
+    }
+
+    body.theme-crv #crv-overlay-effects {
+      display: block;
+      animation: crvScreenFlicker 0.14s infinite;
+    }
+
+    /* Faint Static + Scanlines */
+    .crv-static-field {
+      position: absolute;
+      inset: 0;
+      background-image:
+        repeating-linear-gradient(
+          0deg,
+          rgba(0, 0, 0, 0.35) 0px,
+          rgba(0, 0, 0, 0.35) 1px,
+          transparent 1px,
+          transparent 3px
+        ),
+        url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.07'/%3E%3C/svg%3E");
+    }
+
+    /* Thin Transparent White Line with Faint Static Around Going Up and Down */
+    .crv-scan-bar {
+      position: absolute;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: rgba(255, 255, 255, 0.42);
+      box-shadow:
+        0 0 12px 4px rgba(255, 255, 255, 0.18),
+        0 -8px 14px rgba(255, 255, 255, 0.08),
+        0 8px 14px rgba(255, 255, 255, 0.08);
+      animation: crvLineUpDown 6.5s ease-in-out infinite alternate;
+    }
+
+    .crv-scan-bar::after {
+      content: "";
+      position: absolute;
+      top: -16px;
+      left: 0;
+      width: 100%;
+      height: 35px;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 240 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='s'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.95' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23s)' opacity='0.22'/%3E%3C/svg%3E");
+    }
+
+    @keyframes crvLineUpDown {
+      0% { top: 2%; }
+      100% { top: 97%; }
+    }
+
+    @keyframes crvScreenFlicker {
+      0% { opacity: 0.97; }
+      50% { opacity: 1; }
+      100% { opacity: 0.98; }
+    }
+
+    /* ==========================================================================
+       THEME 4: THE MAGNUS ARCHIVES (Old File Color Scheme, Webs, Encoded Tape, Lighter)
+       ========================================================================== */
+    body.theme-tma {
+      --bg-primary: #1b1812;
+      --bg-secondary: #2a241b;
+      --bg-card: #d8ccb2;
+      --text-primary: #1e1912;
+      --text-muted: #524737;
+      --accent-primary: #2e5a27;
+      --accent-secondary: #1e3f19;
+      --border-color: #7c6d53;
+      --font-main: 'Courier New', Courier, monospace;
+      /* Thin Webs & All-Seeing Eyes in Background */
+      background-color: #1b1812;
+      background-image:
+        url("data:image/svg+xml,%3Csvg width='260' height='260' viewBox='0 0 260 260' xmlns='http://www.w3.org/2000/svg'%3E%3Cg stroke='%23a3967c' stroke-width='0.55' fill='none' opacity='0.24'%3E%3Cline x1='0' y1='0' x2='260' y2='260'/%3E%3Cline x1='260' y1='0' x2='0' y2='260'/%3E%3Cline x1='130' y1='0' x2='130' y2='260'/%3E%3Cline x1='0' y1='130' x2='260' y2='130'/%3E%3Ccircle cx='130' cy='130' r='30'/%3E%3Ccircle cx='130' cy='130' r='65'/%3E%3Ccircle cx='130' cy='130' r='100'/%3E%3Cpath d='M105 130 Q130 112 155 130 Q130 148 105 130 Z' stroke='%234a7c3f' stroke-width='1.1'/%3E%3Ccircle cx='130' cy='130' r='5' fill='%234a7c3f'/%3E%3C/g%3E%3C/svg%3E");
+    }
+
+    /* All Text and Image Boxes Surrounded by Encoded Cassette Tape & Archival Tape Borders */
+    body.theme-tma .content-box,
+    body.theme-tma .image-frame,
+    body.theme-tma .file-icon-wrapper {
+      background-color: #dfd3b8;
+      color: #1e1912;
+      border: 14px solid transparent;
+      border-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Crect width='60' height='60' fill='%2333291f' stroke='%238c7b60' stroke-width='2'/%3E%3Ccircle cx='15' cy='15' r='6' fill='%23dfd3b8'/%3E%3Ccircle cx='45' cy='15' r='6' fill='%23dfd3b8'/%3E%3Ccircle cx='15' cy='45' r='6' fill='%23dfd3b8'/%3E%3Ccircle cx='45' cy='45' r='6' fill='%23dfd3b8'/%3E%3Cpath d='M0 30 H60 M30 0 V60' stroke='%234a7c3f' stroke-width='1.5' stroke-dasharray='4 2'/%3E%3C/svg%3E") 18 round;
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.75), inset 0 0 35px rgba(139, 115, 85, 0.45);
+    }
+
+    /* Encoded Cassette Tape Corner Stamp on TMA Boxes */
+    body.theme-tma .content-box::after,
+    body.theme-tma .image-frame::after {
+      content: "MAG // ARCHIVE TAPE RECORDING";
+      position: absolute;
+      top: -12px;
+      right: 12px;
+      background: #231f1a;
+      color: #c2b49a;
+      font-size: 0.62rem;
+      padding: 2px 8px;
+      border: 1px solid #4a7c3f;
+      letter-spacing: 1.5px;
+      pointer-events: none;
+    }
+
+    body.theme-tma .social-launch-btn,
+    body.theme-tma .key-btn {
+      background: #c7b899;
+      color: #1e1912;
+      border: 2px solid #2e5a27;
+    }
+
+    /* Magnus Archives Web Lighter in the Corner */
+    #tma-lighter-widget {
+      display: none;
+      position: fixed;
+      bottom: 22px;
+      right: 22px;
+      z-index: 2600;
+      cursor: pointer;
+      user-select: none;
+      filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.85));
+    }
+
+    body.theme-tma #tma-lighter-widget {
+      display: block;
+    }
+
+    #tma-lighter-svg {
+      width: 96px;
+      height: 136px;
+      overflow: visible;
+    }
+
+    .lighter-lid-group {
+      transform-origin: 24px 52px;
+      transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    #tma-lighter-widget.lighter-open .lighter-lid-group {
+      transform: rotate(-112deg);
+    }
+
+    .lighter-flame-group {
+      opacity: 0;
+      transform-origin: 48px 46px;
+      transform: scale(0.2);
+      transition: opacity 0.25s ease, transform 0.25s ease;
+    }
+
+    #tma-lighter-widget.lighter-open .lighter-flame-group {
+      opacity: 1;
+      transform: scale(1);
+      animation: lighterFlameFlicker 0.6s infinite alternate;
+    }
+
+    @keyframes lighterFlameFlicker {
+      0% { transform: scale(0.95) rotate(-2deg); }
+      100% { transform: scale(1.06) rotate(2deg); }
+    }
+
+    /* ==========================================================================
+       THEME 5: THE OUTLAST TRIALS (Rustic Psychiatric Hospital, Dual Audio Players)
+       ========================================================================== */
+    body.theme-outlast {
+      --bg-primary: #0f1410;
+      --bg-secondary: #1b241c;
+      --bg-card: #1d261e;
+      --text-primary: #d1d9c9;
+      --text-muted: #7e8f77;
+      --accent-primary: #9e2a2b;
+      --accent-secondary: #540b0e;
+      --border-color: #465342;
+      --font-main: 'Courier New', Courier, monospace;
+      /* Rustic Psychiatric Hospital Tile & Grime Texture */
+      background-color: #0f1410;
+      background-image:
+        radial-gradient(circle at 80% 15%, rgba(158, 42, 43, 0.25), transparent 40%),
+        radial-gradient(circle at 20% 75%, rgba(65, 90, 50, 0.22), transparent 50%),
+        linear-gradient(0deg, rgba(40, 52, 40, 0.28) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(40, 52, 40, 0.28) 1px, transparent 1px);
+      background-size: 100% 100%, 100% 100%, 38px 38px, 38px 38px;
+    }
+
+    body.theme-outlast .content-box,
+    body.theme-outlast .image-frame,
+    body.theme-outlast .file-icon-wrapper {
+      background:
+        linear-gradient(160deg, rgba(29, 38, 30, 0.95), rgba(20, 25, 19, 0.98));
+      border: 2px solid #594433;
+      outline: 1px dashed #9e2a2b;
+      outline-offset: -6px;
+      box-shadow:
+        0 14px 30px rgba(0, 0, 0, 0.9),
+        inset 0 0 40px rgba(84, 11, 14, 0.35);
+      border-radius: 2px;
+    }
+
+    /* Outlast Trials Bottom-Left Audio Players (Slide Out to Right at Bottom Scroll) */
+    #outlast-audio-dock {
+      display: none;
+      position: fixed;
+      bottom: 18px;
+      left: 18px;
+      z-index: 2600;
+      gap: 14px;
+      align-items: center;
+      transform: translateX(-120%);
+      opacity: 0.25;
+      transition: transform 0.55s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease;
+    }
+
+    body.theme-outlast #outlast-audio-dock {
+      display: flex;
+    }
+
+    body.theme-outlast #outlast-audio-dock.scrolled-bottom-reveal {
+      transform: translateX(0%);
+      opacity: 1;
+    }
+
+    .murkoff-audio-unit {
+      background: linear-gradient(180deg, #2b2620, #171411);
+      border: 2px solid #7f5539;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.9), inset 0 0 12px rgba(158, 42, 43, 0.4);
+      padding: 10px 14px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 155px;
+    }
+
+    .murkoff-play-btn {
+      padding: 6px 12px;
+      background: #540b0e;
+      color: #f2e8cf;
+      border: 1px solid #9e2a2b;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      cursor: pointer;
+    }
+
+    .murkoff-play-btn:hover {
+      background: #9e2a2b;
+    }
+
+    .murkoff-led {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #3d403a;
+      box-shadow: inset 0 0 3px #000;
+    }
+
+    .murkoff-led.playing {
+      background: #ef4444;
+      box-shadow: 0 0 8px #ef4444;
+    }
+  </style>
+</head>
+<body class="theme-base">
+
+  <!-- STATIC FLASH BURST OVERLAY (Triggered on CRV + P or Camera Button) -->
+  <div id="static-burst-overlay"></div>
+
+  <!-- OLD TV AESTHETIC (CRV) VISUAL SCANLINE & STATIC OVERLAY -->
+  <div id="crv-overlay-effects">
+    <div class="crv-static-field"></div>
+    <div class="crv-scan-bar"></div>
+  </div>
+
+  <!-- PERSISTENT CAMERA BUTTON (Plain View at All Times) -->
+  <button id="persistent-camera-btn" title="Capture / Trigger CRV Scan">
+    <svg viewBox="0 0 24 24">
+      <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+      <circle cx="12" cy="13" r="4"></circle>
+    </svg>
+  </button>
+
+  <!-- BUTTON TO BRING NAV BAR BACK WHEN HIDDEN -->
+  <button id="restore-nav-btn" title="Show Navigation">NAV &#9654;</button>
+
+  <!-- MAIN SCROLLING VIEWPORT -->
+  <div id="viewport-scroll-container">
+
+    <!-- TOP SCROLL WHEEL BAR -->
+    <div id="top-scroll-wheel-bar">
+      <div class="wheel-housing" title="Scroll Wheel">
+        <div class="wheel-gear" id="visual-wheel-gear"></div>
+      </div>
+      <div class="scroll-track-line">
+        <div id="scroll-progress-fill"></div>
+      </div>
+    </div>
+
+    <!-- NAVIGATION BAR (Starts at top on entrance; locks to side on first scroll for rest of session) -->
+    <nav id="main-nav" class="nav-entrance-top">
+      <!-- 5 Pages -->
+      <div class="nav-section-group">
+        <button class="nav-btn active-page" data-page="page-1">01. Dossier</button>
+        <button class="nav-btn" data-page="page-2">02. Gallery</button>
+        <button class="nav-btn" data-page="page-3">03. Interests</button>
+        <button class="nav-btn" data-page="page-4">04. Socials</button>
+        <button class="nav-btn" data-page="page-5">05. Vault</button>
+      </div>
+
+      <div class="nav-divider"></div>
+
+      <!-- 5 Themes -->
+      <div class="nav-section-group">
+        <button class="nav-btn active-theme" data-theme="theme-base">Base</button>
+        <button class="nav-btn" data-theme="theme-maximalist">Maximalist</button>
+        <button class="nav-btn" data-theme="theme-crv">CRV TV</button>
+        <button class="nav-btn" data-theme="theme-tma">Magnus</button>
+        <button class="nav-btn" data-theme="theme-outlast">Outlast</button>
+      </div>
+
+      <div class="nav-divider"></div>
+
+      <!-- Hide Nav Toggle -->
+      <button id="hide-nav-btn" title="Hide Navigation">Hide</button>
+    </nav>
+
+    <!-- MAIN CONTENT AREA -->
+    <main>
+
+      <!-- ====================================================================
+           PAGE 1: FILE ICON + FILLER TEXT BOX (Secret Number: 1)
+           ==================================================================== -->
+      <section id="page-1" class="page-view active">
+        <div class="secret-page-cipher" data-cipher="1">1</div>
+
+        <div class="content-box page1-layout">
+          <div class="file-icon-wrapper">
+            <svg viewBox="0 0 24 24">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
+            <span class="file-icon-tag">FILE_001.DAT</span>
+          </div>
+
+          <div class="filler-text-box">
+            <p>
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor. Cras elementum ultrices diam. Maecenas ligula massa, varius a, semper congue, euismod non, mi. Proin porttitor, orci nec nonummy molestie, enim est eleifend mi, non fermentum diam nisl sit amet erat.
+            </p>
+            <p>
+              Duis semper. Duis arcu massa, scelerisque vitae, consequat in, pretium a, enim. Pellentesque congue. Ut in risus volutpat libero pharetra tempor. Cras vestibulum bibendum augue. Praesent egestas leo in pede. Praesent blandit odio eu enim. Pellentesque sed dui ut augue blandit sodales. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Aliquam nibh.
+            </p>
+            <p>
+              Mauris ac mauris sed pede pellentesque fermentum. Maecenas adipiscing ante non diam sodales hendrerit. Ut velit mauris, egestas sed, gravida nec, ornare ut, mi. Aenean ut orci vel massa suscipit pulvinar. Nulla sollicitudin. Fusce varius, ligula non tempus aliquam, nunc turpis ullamcorper nibh, in tempus sapien eros vitae ligula.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           PAGE 2: 10 IMAGES GALLERY (Secret Number: 1)
+           ==================================================================== -->
+      <section id="page-2" class="page-view">
+        <div class="secret-page-cipher" data-cipher="1">1</div>
+
+        <!-- ==================================================================
+             DIRECTIONS FOR INPUTTING PERSONAL IMAGES INTO THIS GALLERY:
+             1. Locate each <img class="personal-gallery-slot" ...> tag below (Slots 01 to 10).
+             2. Replace the `src="..."` attribute value with either:
+                - A relative file path in your GitHub repository (e.g., src="assets/my-photo-1.jpg")
+                - A direct full HTTPS image URL (e.g., src="https://raw.githubusercontent.com/username/repo/main/pic.png")
+                - Or a Base64 data URI string.
+             3. Update the `alt="..."` attribute and the `<div class="image-caption">` text below each image if desired.
+             ================================================================== -->
+        <div class="image-grid-10">
+          <!-- IMAGE SLOT 01 -->
+          <div class="image-frame">
+            <img class="personal-gallery-slot" alt="Slot 01" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='300'><rect width='100%' height='100%' fill='%230b132b'/><circle cx='200' cy='150' r='70' stroke='%233b82f6' stroke-width='3' fill='none'/><text x='50%' y='52%' dominant-baseline='middle' text-anchor='middle' fill='%2394a3b8' font-family='monospace' font-size='20'>IMG_SLOT_01</text></svg>" />
+            <div class="image-caption">ARCHIVE_FRAME // 01</div>
+          </div>
+
+          <!-- IMAGE SLOT 02 -->
+          <div class="image-frame">
+            <img class="personal-gallery-slot" alt="Slot 02" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='300'><rect width='100%' height='100%' fill='%23111827'/><path d='M60 240 L200 60 L340 240 Z' stroke='%233b82f6' stroke-width='3' fill='none'/><text x='50%' y='65%' dominant-baseline='middle' text-anchor='middle' fill='%2394a3b8' font-family='monospace' font-size='20'>IMG_SLOT_02</text></svg>" />
+            <div class="image-caption">ARCHIVE_FRAME // 02</div>
+          </div>
+
+          <!-- IMAGE SLOT 03 -->
+          <div class="image-frame">
+            <img class="personal-gallery-slot" alt="Slot 03" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='300'><rect width='100%' height='100%' fill='%230f172a'/><rect x='90' y='60' width='220' height='180' stroke='%233b82f6' stroke-width='3' fill='none'/><text x='50%' y='52%' dominant-baseline='middle' text-anchor='middle' fill='%2394a3b8' font-family='monospace' font-size='20'>IMG_SLOT_03</text></svg>" />
+            <div class="image-caption">ARCHIVE_FRAME // 03</div>
+          </div>
+
+          <!-- IMAGE SLOT 04 -->
+          <div class="image-frame">
+            <img class="personal-gallery-slot" alt="Slot 04" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='300'><rect width='100%' height='100%' fill='%23090d16'/><line x1='0' y1='0' x2='400' y2='300' stroke='%231e293b' stroke-width='4'/><line x1='400' y1='0' x2='0' y2='300' stroke='%231e293b' stroke-width='4'/><text x='50%' y='52%' dominant-baseline='middle' text-anchor='middle' fill='%2394a3b8' font-family='monospace' font-size='20'>IMG_SLOT_04</text></svg>" />
+            <div class="image-caption">ARCHIVE_FRAME // 04</div>
+          </div>
+
+          <!-- IMAGE SLOT 05 -->
+          <div class="image-frame">
+            <img class="personal-gallery-slot" alt="Slot 05" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='300'><rect width='100%' height='100%' fill='%230b132b'/><circle cx='200' cy='150' r='90' stroke='%233b82f6' stroke-dasharray='8 6' stroke-width='3' fill='none'/><text x='50%' y='52%' dominant-baseline='middle' text-anchor='middle' fill='%2394a3b8' font-family='monospace' font-size='20'>IMG_SLOT_05</text></svg>" />
+            <div class="image-caption">ARCHIVE_FRAME // 05</div>
+          </div>
+
+          <!-- IMAGE SLOT 06 -->
+          <div class="image-frame">
+            <img class="personal-gallery-slot" alt="Slot 06" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='300'><rect width='100%' height='100%' fill='%23111827'/><polygon points='200,40 340,150 200,260 60,150' stroke='%233b82f6' stroke-width='3' fill='none'/><text x='50%' y='52%' dominant-baseline='middle' text-anchor='middle' fill='%2394a3b8' font-family='monospace' font-size='20'>IMG_SLOT_06</text></svg>" />
+            <div class="image-caption">ARCHIVE_FRAME // 06</div>
+          </div>
+
+          <!-- IMAGE SLOT 07 -->
+          <div class="image-frame">
+            <img class="personal-gallery-slot" alt="Slot 07" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='300'><rect width='100%' height='100%' fill='%230f172a'/><circle cx='200' cy='150' r='45' stroke='%233b82f6' stroke-width='3' fill='none'/><circle cx='200' cy='150' r='85' stroke='%233b82f6' stroke-width='1.5' fill='none'/><text x='50%' y='52%' dominant-baseline='middle' text-anchor='middle' fill='%2394a3b8' font-family='monospace' font-size='20'>IMG_SLOT_07</text></svg>" />
+            <div class="image-caption">ARCHIVE_FRAME // 07</div>
+          </div>
+
+          <!-- IMAGE SLOT 08 -->
+          <div class="image-frame">
+            <img class="personal-gallery-slot" alt="Slot 08" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='300'><rect width='100%' height='100%' fill='%23090d16'/><rect x='60' y='50' width='280' height='200' rx='20' stroke='%233b82f6' stroke-width='3' fill='none'/><text x='50%' y='52%' dominant-baseline='middle' text-anchor='middle' fill='%2394a3b8' font-family='monospace' font-size='20'>IMG_SLOT_08</text></svg>" />
+            <div class="image-caption">ARCHIVE_FRAME // 08</div>
+          </div>
+
+          <!-- IMAGE SLOT 09 -->
+          <div class="image-frame">
+            <img class="personal-gallery-slot" alt="Slot 09" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='300'><rect width='100%' height='100%' fill='%230b132b'/><path d='M50 150 Q200 30 350 150 Q200 270 50 150 Z' stroke='%233b82f6' stroke-width='3' fill='none'/><text x='50%' y='52%' dominant-baseline='middle' text-anchor='middle' fill='%2394a3b8' font-family='monospace' font-size='20'>IMG_SLOT_09</text></svg>" />
+            <div class="image-caption">ARCHIVE_FRAME // 09</div>
+          </div>
+
+          <!-- IMAGE SLOT 10 -->
+          <div class="image-frame">
+            <img class="personal-gallery-slot" alt="Slot 10" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='300'><rect width='100%' height='100%' fill='%23111827'/><rect x='110' y='40' width='180' height='220' stroke='%233b82f6' stroke-width='3' fill='none'/><text x='50%' y='52%' dominant-baseline='middle' text-anchor='middle' fill='%2394a3b8' font-family='monospace' font-size='20'>IMG_SLOT_10</text></svg>" />
+            <div class="image-caption">ARCHIVE_FRAME // 10</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           PAGE 3: CURRENT INTERESTS (One Large Text Box - Secret Number: 3)
+           ==================================================================== -->
+      <section id="page-3" class="page-view">
+        <div class="secret-page-cipher" data-cipher="3">3</div>
+
+        <div class="content-box large-interests-box">
+          <div class="interests-header">CURRENT INTERESTS // LOG</div>
+          <p>
+            Psychological horror worldbuilding, analog broadcast anomalies, archival mystery podcasts, and interactive environmental storytelling. Exploring how interface design shifts tone across minimalist modern architectures and dense, maximalist narrative spaces.
+          </p>
+          <p>
+            <strong>Audio Fiction &amp; Lore:</strong> Deep-dive cataloguing of <em>The Magnus Archives</em> entity classifications, tape recorder motifs, statement transcripts, and interconnected paranormal case files.
+          </p>
+          <p>
+            <strong>Survival Horror &amp; Aesthetics:</strong> <em>The Outlast Trials</em> cold-war experimental facility design, Murkoff Corporation documentation, night-vision phosphor displays, and diegetic sound design.
+          </p>
+          <p>
+            <strong>Hardware &amp; Retro Signals:</strong> Cathode-ray tube scanline artifacts, magnetic tape saturation, frequency synthesis, and hidden cryptographic puzzles embedded directly inside web applications.
+          </p>
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           PAGE 4: SOCIALS + TINY DIFFICULT-TO-READ HINT (Secret Number: 9)
+           ==================================================================== -->
+      <section id="page-4" class="page-view">
+        <div class="secret-page-cipher" data-cipher="9">9</div>
+
+        <div class="content-box socials-card">
+          <div class="social-buttons-row">
+            <!-- Discord Button: officalchilledpozen -->
+            <button
+              class="social-launch-btn"
+              onclick="window.open('https://discord.com/users/officalchilledpozen', '_blank', 'noopener,noreferrer')"
+              title="Open Discord: officalchilledpozen"
+            >
+              <svg viewBox="0 0 24 24">
+                <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994.021-.041.001-.09-.041-.106a13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/>
+              </svg>
+              <span>Discord: officalchilledpozen</span>
+            </button>
+
+            <!-- GitHub Button: prozelyte -->
+            <button
+              class="social-launch-btn"
+              onclick="window.open('https://github.com/prozelyte', '_blank', 'noopener,noreferrer')"
+              title="Open GitHub: prozelyte"
+            >
+              <svg viewBox="0 0 24 24">
+                <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/>
+              </svg>
+              <span>GitHub: prozelyte</span>
+            </button>
+          </div>
+
+          <!-- Small, difficult-to-read secret instruction below buttons -->
+          <div class="obscure-secret-hint">Enter CRV mode and press P.</div>
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           PAGE 5: VAULT PAGE WITH KEYPAD (Code: 1139)
+           ==================================================================== -->
+      <section id="page-5" class="page-view">
+        <div class="content-box vault-wrapper">
+          <div id="vault-lamp" class="vault-status-lamp">VAULT LOCKED</div>
+          <div id="keypad-display" class="keypad-screen">----</div>
+
+          <div class="keypad-grid">
+            <button class="key-btn" data-digit="1">1</button>
+            <button class="key-btn" data-digit="2">2</button>
+            <button class="key-btn" data-digit="3">3</button>
+            <button class="key-btn" data-digit="4">4</button>
+            <button class="key-btn" data-digit="5">5</button>
+            <button class="key-btn" data-digit="6">6</button>
+            <button class="key-btn" data-digit="7">7</button>
+            <button class="key-btn" data-digit="8">8</button>
+            <button class="key-btn" data-digit="9">9</button>
+            <button class="key-btn" data-action="clear">CLR</button>
+            <button class="key-btn" data-digit="0">0</button>
+            <button class="key-btn" data-action="enter">ENT</button>
+          </div>
+        </div>
+
+        <!-- Hidden Gibberish Text Box Behind the Vault -->
+        <div id="vault-unlocked-compartment">
+          <div class="content-box gibberish-box">
+            <p>
+              Xylophone-99 // VQ-8841-KLP: Zqxv trmn bplk wsvy ncxz! Jklo-1139-mnbv cxzl qwer tyui opas dfgh jklz xcvb nmqw erty uiop. Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn. Vexilla regis prodeunt inferni. 01101111 01110000 01100101 01101110.
+            </p>
+            <p style="margin-top: 14px;">
+              Klaatu barada nikto // 77-OMEGA-99-ALPHA: Bzzt-krzz-vrrt! Qwertyuiopasdfghjklzxcvbnm-987654321-zyxwvutsrqponmlkjihgfedcba. Mnbvcxzlkjhgfdsapoiuytrewq.
+            </p>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ========================================================================
+       THE MAGNUS ARCHIVES CORNER LIGHTER WITH SPIDERWEB DESIGN
+       (Only appears when Magnus theme is active; opens & ignites when pressed)
+       ======================================================================== -->
+  <div id="tma-lighter-widget" title="Toggle Web Lighter">
+    <svg id="tma-lighter-svg" viewBox="0 0 96 136">
+      <!-- Flame (Visible when lighter is opened) -->
+      <g class="lighter-flame-group">
+        <path d="M48 8 C36 24 38 42 48 48 C58 42 60 24 48 8 Z" fill="#f59e0b" />
+        <path d="M48 18 C42 28 43 40 48 45 C53 40 54 28 48 18 Z" fill="#fef08a" />
+      </g>
+
+      <!-- Spark Wheel & Chimney -->
+      <rect x="42" y="38" width="12" height="14" rx="2" fill="#78716c" stroke="#292524" stroke-width="1.5" />
+      <circle cx="35" cy="45" r="5" fill="#57534e" stroke="#1c1917" stroke-width="1.5" />
+
+      <!-- Lighter Bottom Case with Spiderweb Engraving -->
+      <g class="lighter-body-group">
+        <rect x="24" y="52" width="48" height="72" rx="4" fill="#b45309" stroke="#d97706" stroke-width="2" />
+        <rect x="26" y="54" width="44" height="68" rx="2" fill="#78350f" />
+        <!-- Spiderweb Design on Lighter Body -->
+        <g stroke="#fcd34d" stroke-width="1" fill="none" opacity="0.85">
+          <line x1="48" y1="54" x2="48" y2="122" />
+          <line x1="26" y1="88" x2="70" y2="88" />
+          <line x1="26" y1="54" x2="70" y2="122" />
+          <line x1="70" y1="54" x2="26" y2="122" />
+          <circle cx="48" cy="88" r="10" />
+          <circle cx="48" cy="88" r="20" />
+        </g>
+      </g>
+
+      <!-- Hinged Lighter Top Lid with Web Design -->
+      <g class="lighter-lid-group">
+        <rect x="24" y="24" width="48" height="28" rx="4" fill="#b45309" stroke="#d97706" stroke-width="2" />
+        <rect x="26" y="26" width="44" height="24" rx="2" fill="#78350f" />
+        <g stroke="#fcd34d" stroke-width="0.9" fill="none" opacity="0.85">
+          <path d="M26 50 L48 26 L70 50" />
+          <path d="M35 50 Q48 36 61 50" />
+        </g>
+      </g>
+    </svg>
+  </div>
+
+  <!-- ========================================================================
+       THE OUTLAST TRIALS BOTTOM-LEFT DUAL AUDIO PLAYERS ("franco" & "liliya")
+       (Only visible in Outlast theme; scrolls out to the right at page bottom)
+       ======================================================================== -->
+  <!--
+    DIRECTIONS FOR ADDING PERSONAL AUDIO RECORDINGS TO "franco" AND "liliya":
+    1. Below you will find two <audio> elements: `#audio-franco` and `#audio-liliya`.
+    2. Put your audio files (e.g., `franco.mp3` and `liliya.mp3` or `.wav` / `.ogg`) into your GitHub repository folder.
+    3. Set the `src=""` attribute on `#audio-franco` and `#audio-liliya`:
+       Example:
+         <audio id="audio-franco" src="audio/franco-recording.mp3" preload="auto"></audio>
+         <audio id="audio-liliya" src="audio/liliya-recording.mp3" preload="auto"></audio>
+    4. When a personal `src` is provided, clicking the "franco" or "liliya" button will play/pause your custom recording. If `src` is left blank, a built-in WebAudio procedural tape transmission plays as a fallback so the buttons always function immediately.
+  -->
+  <div id="outlast-audio-dock">
+    <!-- Left Audio Player: franco -->
+    <div class="murkoff-audio-unit">
+      <div id="led-franco" class="murkoff-led"></div>
+      <button id="btn-audio-franco" class="murkoff-play-btn">franco</button>
+      <audio id="audio-franco" src="" preload="auto"></audio>
+    </div>
+
+    <!-- Right Audio Player: liliya -->
+    <div class="murkoff-audio-unit">
+      <div id="led-liliya" class="murkoff-led"></div>
+      <button id="btn-audio-liliya" class="murkoff-play-btn">liliya</button>
+      <audio id="audio-liliya" src="" preload="auto"></audio>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       APPLICATION LOGIC & AUDIO SYNTHESIS
+       ======================================================================== -->
+  <script>
+    (function () {
+      const scrollContainer = document.getElementById('viewport-scroll-container');
+      const mainNav = document.getElementById('main-nav');
+      const hideNavBtn = document.getElementById('hide-nav-btn');
+      const restoreNavBtn = document.getElementById('restore-nav-btn');
+      const wheelGear = document.getElementById('visual-wheel-gear');
+      const scrollProgressFill = document.getElementById('scroll-progress-fill');
+      const outlastAudioDock = document.getElementById('outlast-audio-dock');
+      const cameraBtn = document.getElementById('persistent-camera-btn');
+      const staticBurstOverlay = document.getElementById('static-burst-overlay');
+      const tmaLighter = document.getElementById('tma-lighter-widget');
+
+      let currentTheme = 'theme-base';
+      let navLockedToSideForSession = false;
+      let cipherFadeTimeout = null;
+
+      /* ======================================================================
+         1. NAVIGATION: LOCK TO SIDE ON SCROLL & HIDE/RESTORE BUTTONS
+         ====================================================================== */
+      scrollContainer.addEventListener('scroll', () => {
+        const scrollTop = scrollContainer.scrollTop;
+        const maxScroll = scrollContainer.scrollHeight - scrollContainer.clientHeight;
+        const percent = maxScroll > 0 ? (scrollTop / maxScroll) * 100 : 0;
+
+        // Update Top Scroll Wheel Indicator
+        scrollProgressFill.style.width = `${percent}%`;
+        wheelGear.style.transform = `translateY(${(scrollTop % 12)}px)`;
+
+        // Lock nav bar to the side on first scroll down for the rest of the session
+        if (!navLockedToSideForSession && scrollTop > 20) {
+          navLockedToSideForSession = true;
+          mainNav.classList.remove('nav-entrance-top');
+          mainNav.classList.add('nav-locked-side');
+        }
+
+        // Outlast Trials: Slide out "franco" and "liliya" audio players when scrolled near bottom
+        if (maxScroll - scrollTop <= 120) {
+          outlastAudioDock.classList.add('scrolled-bottom-reveal');
+        } else {
+          outlastAudioDock.classList.remove('scrolled-bottom-reveal');
+        }
+      });
+
+      // Allow scrolling the page by dragging/wheeling over the top scroll wheel bar
+      document.getElementById('top-scroll-wheel-bar').addEventListener('wheel', (e) => {
+        scrollContainer.scrollTop += e.deltaY;
+      });
+
+      // Hide Nav Bar
+      hideNavBtn.addEventListener('click', () => {
+        mainNav.classList.add('nav-hidden');
+        restoreNavBtn.classList.add('visible');
+      });
+
+      // Bring Nav Bar Back
+      restoreNavBtn.addEventListener('click', () => {
+        mainNav.classList.remove('nav-hidden');
+        restoreNavBtn.classList.remove('visible');
+      });
+
+      /* ======================================================================
+         2. PAGE SWITCHING (5 PAGES)
+         ====================================================================== */
+      const pageButtons = document.querySelectorAll('[data-page]');
+      const pageViews = document.querySelectorAll('.page-view');
+
+      pageButtons.forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const targetPageId = btn.getAttribute('data-page');
+
+          pageButtons.forEach((b) => b.classList.remove('active-page'));
+          btn.classList.add('active-page');
+
+          pageViews.forEach((view) => {
+            view.classList.toggle('active', view.id === targetPageId);
+          });
+
+          // Reset scroll position to top of new page (keeps nav locked if already locked)
+          scrollContainer.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+      });
+
+      /* ======================================================================
+         3. THEME SWITCHING & CRV GENTLE 60Hz TV BUZZ GENERATOR
+         ====================================================================== */
+      let audioCtx = null;
+      let crvBuzzOsc = null;
+      let crvBuzzGain = null;
+
+      function ensureAudioContext() {
+        if (!audioCtx) {
+          const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+          audioCtx = new AudioContextClass();
+        }
+        if (audioCtx.state === 'suspended') {
+          audioCtx.resume();
+        }
+      }
+
+      function startCrvGentleBuzz() {
+        try {
+          ensureAudioContext();
+          if (crvBuzzOsc) return;
+
+          crvBuzzOsc = audioCtx.createOscillator();
+          const filter = audioCtx.createBiquadFilter();
+          crvBuzzGain = audioCtx.createGain();
+
+          // 60Hz CRT television hum
+          crvBuzzOsc.type = 'sawtooth';
+          crvBuzzOsc.frequency.setValueAtTime(60, audioCtx.currentTime);
+
+          filter.type = 'lowpass';
+          filter.frequency.setValueAtTime(180, audioCtx.currentTime);
+
+          // Very gentle, subtle volume
+          crvBuzzGain.gain.setValueAtTime(0.015, audioCtx.currentTime);
+
+          crvBuzzOsc.connect(filter);
+          filter.connect(crvBuzzGain);
+          crvBuzzGain.connect(audioCtx.destination);
+          crvBuzzOsc.start();
+        } catch (err) {
+          // Ignore autoplay restrictions until next user interaction
+        }
+      }
+
+      function stopCrvGentleBuzz() {
+        if (crvBuzzOsc) {
+          try {
+            crvBuzzOsc.stop();
+            crvBuzzOsc.disconnect();
+          } catch (e) {}
+          crvBuzzOsc = null;
+          crvBuzzGain = null;
+        }
+      }
+
+      const themeButtons = document.querySelectorAll('[data-theme]');
+      themeButtons.forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const selectedTheme = btn.getAttribute('data-theme');
+          currentTheme = selectedTheme;
+
+          themeButtons.forEach((b) => b.classList.remove('active-theme'));
+          btn.classList.add('active-theme');
+
+          document.body.className = selectedTheme;
+
+          if (selectedTheme === 'theme-crv') {
+            startCrvGentleBuzz();
+          } else {
+            stopCrvGentleBuzz();
+          }
+        });
+      });
+
+      /* ======================================================================
+         4. SECRET CRV MODE + 'P' KEY & CAMERA BUTTON MECHANIC
+            Flashes static, then glows green numbers (1, 1, 3, 9) across Pages 1-4
+         ====================================================================== */
+      function playStaticBurstSound() {
+        try {
+          ensureAudioContext();
+          const bufferSize = audioCtx.sampleRate * 0.22;
+          const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+          const data = buffer.getChannelData(0);
+          for (let i = 0; i < bufferSize; i++) {
+            data[i] = Math.random() * 2 - 1;
+          }
+
+          const noise = audioCtx.createBufferSource();
+          noise.buffer = buffer;
+
+          const gain = audioCtx.createGain();
+          gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.2);
+
+          noise.connect(gain);
+          gain.connect(audioCtx.destination);
+          noise.start();
+        } catch (e) {}
+      }
+
+      function triggerCrvCipherSequence() {
+        // Only activates when in CRV mode
+        if (currentTheme !== 'theme-crv') return;
+
+        playStaticBurstSound();
+
+        // 1. Flash screen to static
+        staticBurstOverlay.classList.add('flash-now');
+        setTimeout(() => {
+          staticBurstOverlay.classList.remove('flash-now');
+        }, 220);
+
+        // 2. Reveal glowing green numbers on each of the pages (Page 1: 1, Page 2: 1, Page 3: 3, Page 4: 9)
+        const ciphers = document.querySelectorAll('.secret-page-cipher');
+        ciphers.forEach((el) => el.classList.add('glowing-active'));
+
+        if (cipherFadeTimeout) clearTimeout(cipherFadeTimeout);
+        cipherFadeTimeout = setTimeout(() => {
+          ciphers.forEach((el) => el.classList.remove('glowing-active'));
+        }, 3200);
+      }
+
+      // Trigger via 'P' key on keyboard
+      window.addEventListener('keydown', (e) => {
+        if (e.key === 'p' || e.key === 'P') {
+          triggerCrvCipherSequence();
+        }
+      });
+
+      // Trigger via Persistent Camera Button
+      cameraBtn.addEventListener('click', () => {
+        triggerCrvCipherSequence();
+      });
+
+      /* ======================================================================
+         5. THE MAGNUS ARCHIVES LIGHTER INTERACTION
+         ====================================================================== */
+      tmaLighter.addEventListener('click', () => {
+        tmaLighter.classList.toggle('lighter-open');
+      });
+
+      /* ======================================================================
+         6. THE OUTLAST TRIALS AUDIO PLAYERS ("franco" & "liliya")
+         ====================================================================== */
+      let synthFallbackInterval = null;
+
+      function setupOutlastAudioPlayer(btnId, audioId, ledId, pitchBase) {
+        const btn = document.getElementById(btnId);
+        const audioEl = document.getElementById(audioId);
+        const ledEl = document.getElementById(ledId);
+        let fallbackActive = false;
+
+        btn.addEventListener('click', () => {
+          const srcAttr = audioEl.getAttribute('src');
+
+          // If user added a personal audio recording path in `src`, play/pause that file
+          if (srcAttr && srcAttr.trim() !== '') {
+            if (audioEl.paused) {
+              audioEl.play();
+              ledEl.classList.add('playing');
+            } else {
+              audioEl.pause();
+              ledEl.classList.remove('playing');
+            }
+            audioEl.onended = () => ledEl.classList.remove('playing');
+          } else {
+            // Fallback procedural tape cue if no personal audio file is attached yet
+            ensureAudioContext();
+            if (fallbackActive) {
+              fallbackActive = false;
+              ledEl.classList.remove('playing');
+              return;
+            }
+            fallbackActive = true;
+            ledEl.classList.add('playing');
+
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(pitchBase, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(pitchBase * 0.72, audioCtx.currentTime + 1.4);
+
+            gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 1.4);
+
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 1.45);
+
+            setTimeout(() => {
+              fallbackActive = false;
+              ledEl.classList.remove('playing');
+            }, 1450);
+          }
+        });
+      }
+
+      setupOutlastAudioPlayer('btn-audio-franco', 'audio-franco', 'led-franco', 220);
+      setupOutlastAudioPlayer('btn-audio-liliya', 'audio-liliya', 'led-liliya', 310);
+
+      /* ======================================================================
+         7. PAGE 5 VAULT KEYPAD (CODE: 1139)
+         ====================================================================== */
+      const VAULT_CODE = '1139';
+      let currentInput = '';
+      const keypadDisplay = document.getElementById('keypad-display');
+      const vaultLamp = document.getElementById('vault-lamp');
+      const vaultCompartment = document.getElementById('vault-unlocked-compartment');
+
+      function updateKeypadScreen() {
+        keypadDisplay.textContent = currentInput.padEnd(4, '-');
+      }
+
+      function verifyVaultCode() {
+        if (currentInput === VAULT_CODE) {
+          vaultLamp.textContent = 'VAULT UNLOCKED // ACCESS GRANTED';
+          vaultLamp.classList.add('unlocked');
+          vaultCompartment.classList.add('revealed');
+          keypadDisplay.style.color = '#4ade80';
+        } else {
+          keypadDisplay.textContent = 'ERR!';
+          keypadDisplay.style.color = '#f87171';
+          setTimeout(() => {
+            currentInput = '';
+            keypadDisplay.style.color = '#38bdf8';
+            updateKeypadScreen();
+          }, 650);
+        }
+      }
+
+      document.querySelectorAll('.key-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const digit = btn.getAttribute('data-digit');
+          const action = btn.getAttribute('data-action');
+
+          if (digit !== null) {
+            if (currentInput.length < 4) {
+              currentInput += digit;
+              updateKeypadScreen();
+              if (currentInput.length === 4) {
+                verifyVaultCode();
+              }
+            }
+          } else if (action === 'clear') {
+            currentInput = '';
+            vaultLamp.textContent = 'VAULT LOCKED';
+            vaultLamp.classList.remove('unlocked');
+            vaultCompartment.classList.remove('revealed');
+            keypadDisplay.style.color = '#38bdf8';
+            updateKeypadScreen();
+          } else if (action === 'enter') {
+            verifyVaultCode();
+          }
+        });
+      });
+    })();
+  </script>
+</body>
+</html>
